@@ -23,6 +23,13 @@ class PayPalController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
         ]);
+
+        if (! config('services.paypal.client_id') || ! config('services.paypal.secret')) {
+            return response()->json([
+                'message' => 'PayPal no está configurado todavía. Inténtalo más tarde.',
+            ], 503);
+        }
+
         $price = self::PRODUCTS[$validated['title']];
         $accessToken = $this->accessToken();
         $baseUrl = rtrim(config('services.paypal.base_url'), '/');
@@ -78,6 +85,12 @@ class PayPalController extends Controller
 
     public function captureOrder(string $orderId)
     {
+        if (! config('services.paypal.client_id') || ! config('services.paypal.secret')) {
+            return response()->json([
+                'message' => 'PayPal no está configurado todavía. Inténtalo más tarde.',
+            ], 503);
+        }
+
         $order = DB::table('paypal_orders')->where('paypal_order_id', $orderId)->first();
 
         if (! $order) {

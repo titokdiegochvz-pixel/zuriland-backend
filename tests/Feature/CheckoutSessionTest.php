@@ -25,6 +25,32 @@ class CheckoutSessionTest extends TestCase
             ->assertJsonValidationErrors(['title']);
     }
 
+    public function test_stripe_checkout_reports_when_credentials_are_missing(): void
+    {
+        config(['services.stripe.secret' => null]);
+
+        $this->postJson('/api/create-checkout-session', [
+            'title' => 'Elite',
+        ])
+            ->assertServiceUnavailable()
+            ->assertJsonPath('message', 'Los pagos con tarjeta no están configurados todavía. Inténtalo más tarde.');
+    }
+
+    public function test_paypal_order_reports_when_credentials_are_missing(): void
+    {
+        config([
+            'services.paypal.client_id' => null,
+            'services.paypal.secret' => null,
+        ]);
+        Http::fake();
+
+        $this->postJson('/api/paypal/orders', ['title' => 'Elite'])
+            ->assertServiceUnavailable()
+            ->assertJsonPath('message', 'PayPal no está configurado todavía. Inténtalo más tarde.');
+
+        Http::assertNothingSent();
+    }
+
     public function test_paypal_order_uses_the_server_catalog_price(): void
     {
         config([

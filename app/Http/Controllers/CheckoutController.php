@@ -22,6 +22,12 @@ class CheckoutController extends Controller
             'title' => ['required', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
         ]);
 
+        if (! config('services.stripe.secret')) {
+            return response()->json([
+                'message' => 'Los pagos con tarjeta no están configurados todavía. Inténtalo más tarde.',
+            ], 503);
+        }
+
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $session = Session::create([
