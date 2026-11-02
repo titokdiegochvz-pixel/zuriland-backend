@@ -11,18 +11,18 @@ class CheckoutSessionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_checkout_requires_a_title_and_positive_price(): void
+    public function test_checkout_requires_a_catalog_product(): void
     {
         $this->postJson('/api/create-checkout-session')
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['title', 'price']);
+            ->assertJsonValidationErrors(['title']);
 
         $this->postJson('/api/create-checkout-session', [
-            'title' => 'Producto',
-            'price' => 0,
+            'title' => 'Producto inventado',
+            'price' => 1,
         ])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['price']);
+            ->assertJsonValidationErrors(['title']);
     }
 
     public function test_paypal_order_uses_the_server_catalog_price(): void

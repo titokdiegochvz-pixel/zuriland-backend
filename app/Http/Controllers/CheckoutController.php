@@ -8,11 +8,18 @@ use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
+    private const PRODUCTS = [
+        'Elite' => 49,
+        'Dios' => 99,
+        'Leyenda' => 199,
+        'Pack Utilidad' => 49,
+        'Pack Maestro' => 149,
+    ];
+
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'integer', 'min:1'],
+            'title' => ['required', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
         ]);
 
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -22,7 +29,7 @@ class CheckoutController extends Controller
                 'price_data' => [
                     'currency' => 'mxn', // o 'usd'
                     'product_data' => ['name' => $validated['title']],
-                    'unit_amount' => $validated['price'] * 100,
+                    'unit_amount' => self::PRODUCTS[$validated['title']] * 100,
                 ],
                 'quantity' => 1,
             ]],
