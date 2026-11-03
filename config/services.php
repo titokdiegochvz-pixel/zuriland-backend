@@ -45,6 +45,10 @@ return [
         'base_url' => env('PAYPAL_BASE_URL', 'https://api-m.sandbox.paypal.com'),
     ],
 
+    'towny' => [
+        'sync_token' => env('TOWNY_SYNC_TOKEN'),
+    ],
+
     'frontend' => [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
     ],

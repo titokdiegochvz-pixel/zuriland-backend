@@ -9,6 +9,7 @@ vendor
 public/build
 public/hot
 public/site
+minecraft-plugin/target
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*
