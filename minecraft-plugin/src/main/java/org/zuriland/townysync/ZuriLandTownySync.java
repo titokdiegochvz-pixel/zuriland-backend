@@ -335,6 +335,12 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             HttpResponse<Void> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 getLogger().info("Synced the Towny ranking (" + nationCount + " nations).");
+            } else if (response.statusCode() == 429) {
+                String retryAfter = response.headers().firstValue("Retry-After").orElse("unknown");
+                getLogger().warning(
+                    "Towny ranking sync was rate-limited (HTTP 429); retry after "
+                        + retryAfter + " seconds."
+                );
             } else {
                 getLogger().warning("Towny ranking sync failed with HTTP " + response.statusCode() + ".");
             }
