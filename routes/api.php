@@ -12,7 +12,7 @@ use App\Http\Controllers\TownyTownController;
 Route::get('/minecraft/status', [MinecraftStatusController::class, 'show'])->middleware('throttle:120,1');
 Route::post('/minecraft/status', [MinecraftStatusController::class, 'store'])->middleware('throttle:30,1');
 Route::get('/towny/ranking', [TownyRankingController::class, 'show']);
-Route::post('/towny/ranking', [TownyRankingController::class, 'store'])->middleware('throttle:10,1');
+Route::post('/towny/ranking', [TownyRankingController::class, 'store'])->middleware('throttle:60,1');
 Route::get('/towny/kills', [TownyTownController::class, 'index'])->middleware('throttle:120,1');
 Route::post('/towny/kills', [TownyKillController::class, 'store'])->middleware('throttle:600,1');
 Route::post('/towny/towns', [TownyTownController::class, 'store'])->middleware('throttle:10,1');
