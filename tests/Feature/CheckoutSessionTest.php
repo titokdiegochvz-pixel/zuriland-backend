@@ -36,6 +36,50 @@ class CheckoutSessionTest extends TestCase
             ->assertJsonPath('message', 'Los pagos con tarjeta no están configurados todavía. Inténtalo más tarde.');
     }
 
+    public function test_stripe_cart_checkout_uses_catalog_prices_and_quantities(): void
+    {
+        config([
+            'services.stripe.secret' => 'sk_test_zuriland',
+            'services.frontend.url' => 'https://zuriland-frontend.onrender.com',
+        ]);
+        $stripeClient = new class implements \Stripe\HttpClient\ClientInterface
+        {
+            public array $requests = [];
+
+            public function request($method, $absUrl, $headers, $params, $hasFile, $apiMode = 'v1', $maxNetworkRetries = null)
+            {
+                $this->requests[] = compact('method', 'absUrl', 'params', 'apiMode');
+
+                return [
+                    json_encode(['id' => 'cs_test_cart', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_cart']),
+                    200,
+                    ['Content-Type' => 'application/json'],
+                ];
+            }
+        };
+        \Stripe\ApiRequestor::setHttpClient($stripeClient);
+
+        try {
+            $this->postJson('/api/create-checkout-session', [
+                'items' => [
+                    ['title' => 'Dios', 'quantity' => 2],
+                    ['title' => 'Elite', 'quantity' => 1],
+                ],
+            ])
+                ->assertOk()
+                ->assertJsonPath('url', 'https://checkout.stripe.com/c/pay/cs_test_cart');
+
+            $this->assertCount(1, $stripeClient->requests);
+            $lineItems = $stripeClient->requests[0]['params']['line_items'];
+            $this->assertSame(2, $lineItems[0]['quantity']);
+            $this->assertSame(9900, $lineItems[0]['price_data']['unit_amount']);
+            $this->assertSame(1, $lineItems[1]['quantity']);
+            $this->assertSame(4900, $lineItems[1]['price_data']['unit_amount']);
+        } finally {
+            \Stripe\ApiRequestor::setHttpClient(null);
+        }
+    }
+
     public function test_paypal_order_reports_when_credentials_are_missing(): void
     {
         config([

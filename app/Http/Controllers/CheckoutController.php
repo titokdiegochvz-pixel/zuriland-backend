@@ -19,7 +19,10 @@ class CheckoutController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'title' => ['required_without:items', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'items' => ['required_without:title', 'array', 'min:1', 'max:5'],
+            'items.*.title' => ['required', 'string', 'distinct', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
         ]);
 
         if (! config('services.stripe.secret')) {
@@ -28,17 +31,22 @@ class CheckoutController extends Controller
             ], 503);
         }
 
+        $items = isset($validated['items'])
+            ? $validated['items']
+            : [['title' => $validated['title'], 'quantity' => 1]];
+        $lineItems = array_map(fn (array $item) => [
+            'price_data' => [
+                'currency' => 'mxn',
+                'product_data' => ['name' => $item['title']],
+                'unit_amount' => self::PRODUCTS[$item['title']] * 100,
+            ],
+            'quantity' => $item['quantity'],
+        ], $items);
+
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $session = Session::create([
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'mxn', // o 'usd'
-                    'product_data' => ['name' => $validated['title']],
-                    'unit_amount' => self::PRODUCTS[$validated['title']] * 100,
-                ],
-                'quantity' => 1,
-            ]],
+            'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => rtrim(config('services.frontend.url'), '/').'/pago-exitoso',
             'cancel_url' => rtrim(config('services.frontend.url'), '/').'/pago-cancelado',
