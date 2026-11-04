@@ -1,0 +1,251 @@
+
+.server-banner {
+    position: relative;
+    width: 100%;
+    height: 188px;
+    box-sizing: border-box;
+    background: linear-gradient(
+        120deg,
+        #243b70 0%,
+        #4656a8 50%,
+        #6d35a8 100%
+    );
+    overflow: visible;
+    color: #fff;
+    border-bottom: 3px solid #8b35d6;
+    z-index: 2;
+}
+
+.server-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 20, 45, 0.16);
+    pointer-events: none;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    width: min(1145px, 94%);
+    height: 100%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+}
+
+.banner-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.banner-players {
+    justify-self: start;
+}
+
+.banner-icon {
+    font-size: 35px;
+    flex-shrink: 0;
+}
+
+.banner-item strong,
+.banner-small {
+    display: block;
+}
+
+.banner-small {
+    margin-bottom: 5px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 11px;
+}
+
+.banner-item strong {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.banner-center {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 9px;
+    position: relative;
+    min-width: 0;
+}
+
+.logo-z {
+    width: 112px;
+    height: 112px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #8bbce5, #f0f4fa);
+    color: #fff;
+    font-size: 91px;
+    font-weight: 300;
+    font-family: Georgia, serif;
+    text-shadow: 2px 3px 4px #777;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.btn-play {
+    padding: 9px 24px;
+    border: 2px solid #a78bfa;
+    border-radius: 30px;
+    background: #fff;
+    color: #6d35a8;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-play:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 12px #0002;
+}
+
+.banner-discord {
+    justify-self: end;
+    text-align: right;
+}
+
+.discord-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    background: #fff;
+    color: #5865f2;
+    font-size: 24px;
+}
+
+/* Ventana que aparece al pulsar Juega ahora */
+.guia-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.guia-modal {
+    position: relative;
+    width: min(1020px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+    padding: 18px;
+    box-sizing: border-box;
+    border: 2px solid #7561ed;
+    border-radius: 10px;
+    background: #171526;
+    text-align: center;
+}
+
+.guia-imagen {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 78vh;
+    object-fit: contain;
+    margin: 0 auto 14px;
+}
+
+.guia-cerrar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 6px;
+    background: #25234a;
+    color: #fff;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.guia-copiar {
+    padding: 11px 22px;
+    border: 0;
+    border-radius: 7px;
+    background: #6254dc;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.guia-copiar:hover {
+    background: #8075f0;
+}
+
+.guia-error {
+    color: #fca5a5;
+    padding: 16px;
+}
+
+@media (max-width: 600px) {
+    .server-banner {
+        height: 190px;
+    }
+
+    .banner-content {
+        width: 96%;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .banner-icon {
+        font-size: 23px;
+    }
+
+    .banner-item {
+        gap: 5px;
+    }
+
+    .banner-small {
+        font-size: 8px;
+    }
+
+    .banner-item strong {
+        font-size: 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .logo-z {
+        width: 76px;
+        height: 76px;
+        font-size: 64px;
+    }
+
+    .btn-play {
+        padding: 7px 12px;
+        font-size: 11px;
+    }
+
+    .discord-icon {
+        width: 25px;
+        height: 29px;
+        font-size: 18px;
+    }
+
+    .guia-modal {
+        padding: 10px;
+    }
+
+    .guia-imagen {
+        max-height: 75vh;
+    }
+}

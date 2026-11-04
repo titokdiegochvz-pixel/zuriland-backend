@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -119,7 +118,10 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         );
         getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("Towny rankings will sync to ZuriLand every " + syncIntervalSeconds + " seconds.");
-        getLogger().info("Online Towny players will sync to ZuriLand every " + townRosterSyncIntervalSeconds + " seconds.");
+        getLogger().info(
+            "Towny residents and connection statuses will sync to ZuriLand every "
+                + townRosterSyncIntervalSeconds + " seconds."
+        );
         getLogger().info("Minecraft player counts will sync to ZuriLand every " + playerSyncIntervalSeconds + " seconds.");
     }
 
@@ -263,7 +265,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             onlinePlayers.put(
                 player.getUniqueId(),
-                new PlayerSnapshot(player.getName(), player.getStatistic(Statistic.PLAYER_KILLS))
+                new PlayerSnapshot(player.getName(), player.getStatistic(Statistic.PLAYER_KILLS), true)
             );
         }
 
@@ -271,8 +273,13 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             List<PlayerSnapshot> players = town.getResidents().stream()
                 .filter(resident -> !resident.isNPC())
                 .filter(Resident::hasUUID)
-                .map(resident -> onlinePlayers.get(resident.getUUID()))
-                .filter(Objects::nonNull)
+                .map(resident -> {
+                    PlayerSnapshot onlinePlayer = onlinePlayers.get(resident.getUUID());
+                    int kills = onlinePlayer != null
+                        ? onlinePlayer.kills()
+                        : Bukkit.getOfflinePlayer(resident.getUUID()).getStatistic(Statistic.PLAYER_KILLS);
+                    return new PlayerSnapshot(resident.getName(), kills, onlinePlayer != null);
+                })
                 .sorted(Comparator.comparing(PlayerSnapshot::name, String.CASE_INSENSITIVE_ORDER))
                 .toList();
             towns.add(new TownSnapshot(town.getName(), players));
@@ -298,6 +305,8 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
                     .append(escapeJson(player.name()))
                     .append("\",\"kills\":")
                     .append(player.kills())
+                    .append(",\"online\":")
+                    .append(player.online())
                     .append('}');
             }
             json.append("]}");
@@ -434,7 +443,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
     private record KillEvent(String eventId, String killerName, String killerTown, String victimName, String occurredAt) {
     }
 
-    private record PlayerSnapshot(String name, int kills) {
+    private record PlayerSnapshot(String name, int kills, boolean online) {
     }
 
     private record TownSnapshot(String name, List<PlayerSnapshot> players) {

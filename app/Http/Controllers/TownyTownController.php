@@ -24,8 +24,12 @@ class TownyTownController extends Controller
                 'name' => $town['name'],
                 'players' => array_map(
                     fn (array|string $player) => is_string($player)
-                        ? ['name' => $player, 'kills' => 0]
-                        : ['name' => $player['name'], 'kills' => (int) $player['kills']],
+                        ? ['name' => $player, 'kills' => 0, 'online' => true]
+                        : [
+                            'name' => $player['name'],
+                            'kills' => (int) $player['kills'],
+                            'online' => (bool) ($player['online'] ?? true),
+                        ],
                     $town['players'] ?? $town['residents'] ?? []
                 ),
                 'kills' => [],
@@ -93,17 +97,26 @@ class TownyTownController extends Controller
             'towns' => ['required', 'array', 'max:1000'],
             'towns.*.name' => ['required', 'string', 'max:100'],
             'towns.*.players' => ['sometimes', 'array', 'max:10000'],
-            'towns.*.players.*' => ['required', 'array:name,kills'],
+            'towns.*.players.*' => ['required', 'array:name,kills,online'],
             'towns.*.players.*.name' => ['required', 'string', 'max:16'],
             'towns.*.players.*.kills' => ['required', 'integer', 'min:0', 'max:1000000000'],
+            'towns.*.players.*.online' => ['sometimes', 'boolean'],
             'towns.*.residents' => ['sometimes', 'array', 'max:10000'],
             'towns.*.residents.*' => ['required', 'string', 'max:16'],
         ]);
 
         $towns = array_map(function (array $town) {
             $players = $town['players'] ?? array_map(
-                fn (string $resident) => ['name' => $resident, 'kills' => 0],
+                fn (string $resident) => ['name' => $resident, 'kills' => 0, 'online' => true],
                 $town['residents'] ?? []
+            );
+            $players = array_map(
+                fn (array $player) => [
+                    'name' => $player['name'],
+                    'kills' => $player['kills'],
+                    'online' => (bool) ($player['online'] ?? true),
+                ],
+                $players
             );
 
             return [

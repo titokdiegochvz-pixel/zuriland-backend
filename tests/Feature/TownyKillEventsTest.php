@@ -102,6 +102,32 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonPath('towns.1.players', []);
     }
 
+    public function test_town_snapshot_keeps_online_and_offline_residents(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    [
+                        'name' => 'Thalassia',
+                        'players' => [
+                            ['name' => 'OnlinePlayer', 'kills' => 3, 'online' => true],
+                            ['name' => 'OfflinePlayer', 'kills' => 8, 'online' => false],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonPath('towns.0.players.0.name', 'OnlinePlayer')
+            ->assertJsonPath('towns.0.players.0.online', true)
+            ->assertJsonPath('towns.0.players.1.name', 'OfflinePlayer')
+            ->assertJsonPath('towns.0.players.1.online', false);
+    }
+
     public function test_town_snapshot_requires_the_sync_token(): void
     {
         config(['services.towny.sync_token' => 'sync-secret']);

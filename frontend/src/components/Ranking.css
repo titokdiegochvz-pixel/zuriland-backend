@@ -1,0 +1,151 @@
+
+.ranking-section {
+    padding: 35px 24px;
+    color: #f1f5f9;
+    background:
+        radial-gradient(ellipse at top left, #7c3aed18, transparent 45%),
+        radial-gradient(ellipse at bottom right, #2563eb18, transparent 45%),
+        #080b18;
+    border: 1px solid #292750;
+    border-radius: 16px;
+}
+
+.ranking-heading {
+    margin-bottom: 26px;
+}
+
+.ranking-back {
+    display: block;
+    margin-bottom: 25px;
+    padding: 9px 13px;
+    color: #c4b5fd;
+    background: #7c3aed18;
+    border: 1px solid #7c3aed66;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.ranking-back:hover {
+    background: #7c3aed33;
+}
+
+.ranking-eyebrow {
+    color: #a5b4fc;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.ranking-heading h2 {
+    margin: 10px 0;
+    font-size: clamp(24px, 4vw, 32px);
+    background: linear-gradient(90deg, #c4b5fd, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.ranking-heading p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.ranking-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.ranking-tab {
+    padding: 11px 14px;
+    color: #a5b4d4;
+    background: #10172a;
+    border: 1px solid #303958;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ranking-tab:hover {
+    border-color: #3b82f6;
+}
+
+.ranking-tab.active {
+    color: white;
+    background: linear-gradient(110deg, #7c3aed, #2563eb);
+    border-color: #818cf8;
+}
+
+.ranking-table-wrap {
+    overflow-x: auto;
+    border: 1px solid #373467;
+    border-radius: 12px;
+}
+
+.ranking-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ranking-table th {
+    padding: 15px 14px;
+    color: #a5b4d4;
+    background: linear-gradient(90deg, #21183c, #111e3c);
+    font-size: 10px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.ranking-table td {
+    padding: 16px 14px;
+    border-top: 1px solid #252c4a;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.ranking-table tbody tr {
+    background: #0d1424;
+    transition: background 0.2s;
+}
+
+.ranking-table tbody tr:hover {
+    background: linear-gradient(90deg, #7c3aed20, #2563eb20);
+}
+
+.rank-position {
+    font-size: 17px !important;
+    font-weight: 800;
+}
+
+.rank-nation {
+    color: #e0e7ff;
+}
+
+.rank-money {
+    color: #a78bfa;
+    font-weight: 700;
+}
+
+.rank-kills {
+    color: #60a5fa;
+    font-weight: 700;
+}
+
+.ranking-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+    color: #8290b4;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .ranking-section {
+        padding: 20px 14px;
+    }
+}

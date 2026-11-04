@@ -1,0 +1,135 @@
+/* Estilos Globales */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0B0E14; /* Fondo oscuro profesional */
+  color: #E6E9EF;
+}
+
+/* Header Profesional */
+header {
+  background: #161B26;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #8A2BE2; /* Morado NeÃ³n */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #E6E9EF;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #00D4FF; /* Azul ElÃ©ctrico */
+}
+
+/* Contenedores de SecciÃ³n */
+section {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+h1, h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* Estilos de Tienda (Cards) */
+.shop-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.rank-card {
+  background: #161B26; /* Azul oscuro profundo */
+  padding: 25px;
+  border-radius: 12px;
+  width: 220px;
+  border: 1px solid #2D3748;
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.rank-card:hover {
+  border-color: #8A2BE2; /* Morado al pasar el mouse */
+  transform: translateY(-10px);
+}
+
+/* Botones */
+.btn-buy {
+  background: linear-gradient(135deg, #8A2BE2, #00D4FF); /* Degradado Morado a Azul */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 15px;
+  transition: opacity 0.3s;
+}
+
+.btn-buy:hover {
+  opacity: 0.9;
+}
+
+/* Formulario de Login/Registro */
+form {
+  background: #161B26;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #2D3748;
+  display: inline-block;
+  text-align: left;
+  min-width: 300px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0 20px 0;
+  background: #0B0E14;
+  border: 1px solid #2D3748;
+  color: #E6E9EF; /* Corregido a blanco/gris claro */
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.password-input {
+  position: relative;
+}
+
+.password-input input {
+  padding-right: 88px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  padding: 10px 6px;
+  border: 0;
+  background: transparent;
+  color: #00D4FF;
+  cursor: pointer;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  margin-bottom: 20px;
+}
+
+.form-options a {
+  color: #00D4FF; /* Azul ElÃ©ctrico */
+}

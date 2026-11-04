@@ -13,7 +13,10 @@
 /.zed
 /auth.json
 /node_modules
+/frontend/node_modules
+/minecraft-plugin/target
 /public/build
+/public/site
 /public/hot
 /public/storage
 /storage/*.key

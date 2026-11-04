@@ -73,11 +73,19 @@ For production, use live credentials and set `PAYPAL_BASE_URL` to
 
 ### Serve frontend and API from one public URL for local testing
 
-From the React project folder, run `npm run build:laravel`. This builds the
-React app with assets under `/site` and copies them into the Laravel project's
-`public/site` directory. The Laravel web routes then serve the React entry
-point for client-side routes, while `/api/*` remains handled by the API routes.
-The generated files are ignored by Git.
+The React source is in `frontend/`. To build the site locally, run:
+
+```powershell
+cd frontend
+npm ci
+npm run build:laravel
+```
+
+This writes the site and its assets to the Laravel project's `public/site`
+directory. The Dockerfile builds the frontend automatically for deployments,
+so generated files remain ignored by Git. The Laravel web routes serve the
+React entry point for client-side routes, while `/api/*` remains handled by the
+API routes.
 
 Start Laravel with `php artisan serve --host=127.0.0.1 --port=8000`, then expose
 that port with a tunnel such as Cloudflare Tunnel. The tunnel URL serves both
@@ -86,9 +94,10 @@ the React website and API, so no separate frontend URL is required. Set
 `php artisan config:clear`. Keep Laravel and the tunnel running; a temporary
 tunnel URL may change when restarted.
 
-The React frontend and Laravel API must both be hosted publicly. Build the
-frontend with `REACT_APP_API_URL` set to the public Laravel API origin (see the
-frontend `.env.example`). Configure the backend environment with:
+The React frontend and Laravel API can be served from the same public URL; in
+that setup the frontend calls `/api/*` on the same origin. If they are hosted
+separately, set `VITE_API_URL` in `frontend/.env` to the public Laravel API
+origin before building. Configure the backend environment with:
 
 ```env
 APP_ENV=production
@@ -105,17 +114,21 @@ secrets out of the public repository. Configure the frontend host to serve
 
 ### Deploy remotely for free with Render
 
-The React frontend and Laravel API are separate GitHub repositories, so deploy
-each `render.yaml` as a Blueprint in Render. The backend Dockerfile uses
-PostgreSQL; create a free database on Neon and set its connection string as
-`DB_URL` in the Render API service. Render's free web service can sleep while
-idle, and Neon free databases scale to zero.
+Deploy `render.yaml` as a Blueprint in Render. The Dockerfile builds the React
+frontend and serves it with the Laravel API. The service uses PostgreSQL;
+create a free database on Neon and set its connection string as `DB_URL`.
+Render's free web service can sleep while idle, and Neon free databases scale
+to zero.
 
 Set the API's `APP_KEY` to the output of `php artisan key:generate --show`.
-After both services deploy, set `APP_URL` to the API's Render URL and set
-`FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, and the frontend's `REACT_APP_API_URL`
-to the corresponding Render URLs. Enter payment-provider credentials directly
-in Render's environment settings; never put them in Git or the frontend.
+After deployment, set `APP_URL` to the API's public URL. Set
+`FRONTEND_URL` and `CORS_ALLOWED_ORIGINS` if the frontend uses a separate
+origin. Enter payment-provider credentials directly in Render's environment
+settings; never put them in Git or the frontend.
+
+Towny city pages list all residents and show connection status; publish the
+updated `minecraft-plugin/target/zuriland-towny-sync-1.0.0.jar` to the Minecraft
+server as well so its roster sync includes offline residents.
 
 ## License
 
