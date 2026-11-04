@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import {
     ArrowRightIcon,
@@ -30,12 +31,15 @@ const PlayerSkin = ({ name }) => {
 };
 
 const Community = ({ onOpenRanking, onOpenRules }) => {
+    const navigate = useNavigate();
     const [snapshot, setSnapshot] = useState(null);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
     const hasSnapshot = useRef(false);
+    const openRanking = onOpenRanking || (() => navigate('/ranking'));
+    const openRules = onOpenRules || (() => navigate('/rules'));
 
     useEffect(() => {
         let isMounted = true;
@@ -132,7 +136,7 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         <button
                             type="button"
                             className="community-button ranking-button"
-                            onClick={onOpenRanking}
+                            onClick={openRanking}
                         >
                             <TrophyIcon />
                             Tabla de clasificación
@@ -142,7 +146,7 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         <button
                             type="button"
                             className="community-button rules-button"
-                            onClick={onOpenRules}
+                            onClick={openRules}
                         >
                             <BookIcon />
                             Reglas
@@ -169,12 +173,12 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                     <button
                         type="button"
                         className="community-shortcut"
-                        onClick={onOpenRanking}
+                        onClick={openRanking}
                     >
                         <span className="shortcut-icon"><TrophyIcon /></span>
                         <span>
                             <strong>Clasificación</strong>
-                            <small>Compara las estadísticas.</small>
+                            <small>Ranking de jugadores por kills.</small>
                         </span>
                     </button>
                 </nav>
