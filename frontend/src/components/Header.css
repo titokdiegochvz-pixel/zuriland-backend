@@ -3,6 +3,8 @@
     position: relative;
     z-index: 5;
     width: 100%;
+    box-sizing: border-box;
+    padding: 0;
     background: #fff;
     border-bottom: 1px solid #e9eaf0;
     box-shadow: 0 3px 10px rgba(30, 40, 70, 0.04);
@@ -59,6 +61,37 @@
     font-size: 17px;
 }
 
+.account-link svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.account-link .account-brand-mark {
+    display: grid;
+    width: 23px;
+    height: 23px;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    border: 1px solid #a5b4fc;
+    border-radius: 7px;
+    font-family: Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.account-link .account-name {
+    overflow: hidden;
+    max-width: 180px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+}
+
 .register-button {
     padding: 10px 16px;
     border: none;
@@ -86,8 +119,18 @@
     border-radius: 9px;
     background: #397cf5;
     color: white;
-    font-size: 15px;
+    text-decoration: none;
     cursor: pointer;
+}
+
+.cart-button svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
 }
 
 .cart-count {
@@ -102,6 +145,7 @@
     font-size: 10px;
     font-weight: bold;
     line-height: 14px;
+    text-align: center;
 }
 
 @media (max-width: 760px) {

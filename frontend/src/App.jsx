@@ -10,10 +10,15 @@ import Ranking from './components/Ranking';
 import Login from './components/Login';
 import Register from './components/Register';
 import { AuthProvider } from './auth/AuthContext';
+import Cart from './components/Cart';
+import { CartProvider, useCart } from './store/CartContext';
 
 import './App.css';
 
 function PagoExitoso() {
+    const { clearCart } = useCart();
+    React.useEffect(() => clearCart(), [clearCart]);
+
     return (
         <section className="content-section">
             <h2>Pago exitoso</h2>
@@ -34,17 +39,19 @@ function PagoCancelado() {
 function App() {
     return (
         <AuthProvider>
-            <Router>
-                <div>
-                    <ServerHeader />
-                    <Header />
+            <CartProvider>
+                <Router>
+                    <div>
+                        <ServerHeader />
+                        <Header />
 
-                    <main>
-                        <Routes>
+                        <main>
+                            <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/home" element={<Home />} />
                             <Route path="/store" element={<Store />} />
                             <Route path="/store/zuriland" element={<Store />} />
+                            <Route path="/cart" element={<Cart />} />
                             <Route path="/community" element={<Community />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/rules" element={
@@ -61,10 +68,11 @@ function App() {
                             <Route path="/pago-exitoso" element={<PagoExitoso />} />
                             <Route path="/pago-cancelado" element={<PagoCancelado />} />
                             <Route path="*" element={<Navigate to="/" />} />
-                        </Routes>
-                    </main>
-                </div>
-            </Router>
+                            </Routes>
+                        </main>
+                    </div>
+                </Router>
+            </CartProvider>
         </AuthProvider>
     );
 }

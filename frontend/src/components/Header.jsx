@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { useCart } from '../store/CartContext';
+import { CartIcon, UserIcon } from './UiIcons';
 import './Header.css';
 
 const Header = () => {
     const { usuario, cerrarSesion } = useAuth();
+    const { count } = useCart();
     const navItems = [
         { id: 'home', label: 'Inicio', path: '/' },
         { id: 'store', label: 'Tienda', path: '/store' },
@@ -30,7 +33,8 @@ const Header = () => {
                     {usuario ? (
                         <>
                             <span className="account-link" role="status">
-                                Hola, {usuario.nombre}
+                                <span className="account-brand-mark" aria-hidden="true">Z</span>
+                                <span className="account-name">Hola, {usuario.nombre}</span>
                             </span>
                             <button type="button" className="register-button" onClick={cerrarSesion}>
                                 Cerrar sesión
@@ -39,7 +43,7 @@ const Header = () => {
                     ) : (
                         <>
                             <Link to="/login" className="account-link">
-                                <span>♙</span> Iniciar sesión
+                                <UserIcon /> Iniciar sesión
                             </Link>
 
                             <Link to="/register" className="register-button">
@@ -48,9 +52,14 @@ const Header = () => {
                         </>
                     )}
 
-                    <Link to="/store" className="cart-button" title="Ir a la tienda">
-                        🛒
-                        <span className="cart-count">0</span>
+                    <Link
+                        to="/cart"
+                        className="cart-button"
+                        title="Ir al carrito"
+                        aria-label={`Carrito, ${count} productos`}
+                    >
+                        <CartIcon />
+                        <span className="cart-count">{count > 99 ? '99+' : count}</span>
                     </Link>
                 </div>
             </nav>

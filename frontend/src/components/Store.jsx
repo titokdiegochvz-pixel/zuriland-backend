@@ -1,174 +1,89 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { API_URL } from '../config/api';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useCart } from '../store/CartContext';
+import { STORE_PRODUCTS } from '../store/catalog';
+import { CartIcon } from './UiIcons';
+import './Store.css';
 
 const Store = () => {
-    const [categoria, setCategoria] = useState('rangos');
-    const [paypalMensaje, setPaypalMensaje] = useState('');
-    const [paypalProcesando, setPaypalProcesando] = useState(false);
-    const [searchParams, setSearchParams] = useSearchParams();
-    const captureStarted = useRef(false);
+    const [category, setCategory] = useState('rangos');
+    const [addedMessage, setAddedMessage] = useState('');
+    const { addItem, count } = useCart();
 
-    const comprar = async (titulo, precio) => {
-        try {
-            const response = await fetch(`${API_URL}/api/create-checkout-session`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    title: titulo,
-                    price: precio
-                })
-            });
+    const products = STORE_PRODUCTS.filter((product) => product.category === category);
 
-            const data = await response.json();
-
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                alert(data.error || 'Error al crear la sesión de pago.');
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('No se pudo conectar con el servidor de pagos.');
-        }
-    };
-
-    const pagarConPayPal = async (titulo) => {
-        setPaypalProcesando(true);
-        setPaypalMensaje('');
-
-        try {
-            const response = await fetch(`${API_URL}/api/paypal/orders`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ title: titulo })
-            });
-            const data = await response.json();
-
-            if (!response.ok || !data.approval_url) {
-                throw new Error(data.message || 'No se pudo iniciar el pago con PayPal.');
-            }
-
-            window.location.assign(data.approval_url);
-        } catch (error) {
-            console.error('Error al iniciar el pago con PayPal:', error);
-            setPaypalMensaje(error.message || 'No se pudo conectar con PayPal.');
-            setPaypalProcesando(false);
-        }
-    };
-
-    useEffect(() => {
-        const paypalStatus = searchParams.get('paypal');
-        const orderId = searchParams.get('token');
-
-        if (paypalStatus === 'cancelled') {
-            setPaypalMensaje('El pago con PayPal fue cancelado.');
-            setSearchParams({}, { replace: true });
-            return;
-        }
-
-        if (paypalStatus !== 'success' || !orderId || captureStarted.current) {
-            return;
-        }
-
-        captureStarted.current = true;
-        setPaypalProcesando(true);
-
-        fetch(`${API_URL}/api/paypal/orders/${encodeURIComponent(orderId)}/capture`, {
-            method: 'POST',
-            headers: { 'Accept': 'application/json' }
-        })
-            .then(async (response) => {
-                const data = await response.json();
-                if (!response.ok || data.status !== 'COMPLETED') {
-                    throw new Error(data.message || 'PayPal no confirmó el pago.');
-                }
-                setPaypalMensaje(`Pago confirmado para ${data.title}.`);
-                setSearchParams({}, { replace: true });
-            })
-            .catch((error) => {
-                console.error('Error al confirmar el pago de PayPal:', error);
-                setPaypalMensaje(error.message || 'No se pudo confirmar el pago.');
-            })
-            .finally(() => setPaypalProcesando(false));
-    }, [searchParams, setSearchParams]);
-
-    const dataTienda = {
-        rangos: [
-            { titulo: 'Elite', precio: 49, desc: 'Kit hierro' },
-            { titulo: 'Dios', precio: 99, desc: 'Kit diamante' },
-            { titulo: 'Leyenda', precio: 199, desc: 'Kit Netherite' }
-        ],
-        cosmeticos: [],
-        comandos: {
-            "Productos": [
-                { titulo: 'Pack Utilidad', precio: 49, desc: '/feed (10m), /heal (15m), /fix (uso único), /enderchest' },
-                { titulo: 'Pack Maestro', precio: 149, desc: '/heal ilimitado, /feed ilimitado, /fix ilimitado, /nick, 10 slots /sethome' }
-            ]
-        }
+    const addToCart = (product) => {
+        addItem(product.title);
+        setAddedMessage(`${product.title} se agregó al carrito.`);
     };
 
     return (
-        <section className="content-section">
-            <h2>Tienda ZURILAND</h2>
-
-            <div className="category-nav">
-                <button onClick={() => setCategoria('rangos')}>Rangos</button>
-                <button onClick={() => setCategoria('cosmeticos')}>Cosméticos</button>
-                <button onClick={() => setCategoria('comandos')}>Comandos</button>
+        <section className="store-page">
+            <div className="store-heading">
+                <h1>Tienda ZURILAND</h1>
+                <p>Mejora tu experiencia en el servidor con rangos, kits y beneficios exclusivos.</p>
             </div>
 
-            {paypalMensaje && <p role="status">{paypalMensaje}</p>}
-            {paypalProcesando && <p role="status">Procesando pago con PayPal...</p>}
-
-            <div className="shop-grid">
-                {categoria === 'comandos' ? (
-                    Object.entries(dataTienda.comandos).map(([seccion, items]) => (
-                        <div key={seccion} style={{ width: '100%', marginBottom: '30px' }}>
-                            <h2 style={{ textAlign: 'left' }}>{seccion}</h2>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                                {items.map((item, index) => (
-                                    <div className="rank-card" key={index}>
-                                        <h3>{item.titulo}</h3>
-                                        <p style={{ fontSize: '0.85rem' }}>{item.desc}</p>
-                                        <p><strong>{item.precio} pesos mexicanos</strong></p>
-                                        <button onClick={() => comprar(item.titulo, item.precio)} className="btn-buy">
-                                            🛒 Pagar con tarjeta
-                                        </button>
-                                        <button onClick={() => pagarConPayPal(item.titulo)} className="btn-buy" disabled={paypalProcesando}>
-                                            Pagar con PayPal
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    dataTienda[categoria] && dataTienda[categoria].length > 0 ? (
-                        dataTienda[categoria].map((item, index) => (
-                            <div className="rank-card" key={index}>
-                                <h3>{item.titulo}</h3>
-                                <p>{item.desc}</p>
-                                <button onClick={() => comprar(item.titulo, item.precio)} className="btn-buy">
-                                    🛒 Pagar con tarjeta - {item.precio} pesos mexicanos
-                                </button>
-                                <button onClick={() => pagarConPayPal(item.titulo)} className="btn-buy" disabled={paypalProcesando}>
-                                    Pagar con PayPal
-                                </button>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No hay productos disponibles en esta categoría.</p>
-                    )
-                )}
+            <div className="category-nav" role="group" aria-label="Categorías de la tienda">
+                <button
+                    type="button"
+                    className={category === 'rangos' ? 'active' : ''}
+                    aria-pressed={category === 'rangos'}
+                    onClick={() => setCategory('rangos')}
+                >
+                    Rangos
+                </button>
+                <button
+                    type="button"
+                    className={category === 'cosmeticos' ? 'active' : ''}
+                    aria-pressed={category === 'cosmeticos'}
+                    onClick={() => setCategory('cosmeticos')}
+                >
+                    Cosméticos
+                </button>
+                <button
+                    type="button"
+                    className={category === 'comandos' ? 'active' : ''}
+                    aria-pressed={category === 'comandos'}
+                    onClick={() => setCategory('comandos')}
+                >
+                    Comandos
+                </button>
             </div>
+
+            <p className="store-cart-status" role="status" aria-live="polite">
+                {addedMessage || (count > 0 ? `${count} productos en tu carrito.` : '')}
+            </p>
+
+            {products.length ? (
+                <div className="shop-grid">
+                    {products.map((product) => (
+                        <article className="rank-card" key={product.title}>
+                            <h2>{product.title}</h2>
+                            <p>{product.description}</p>
+                            <strong className="store-price">
+                                ${product.price} <span>MXN</span>
+                            </strong>
+                            <button
+                                type="button"
+                                className="btn-buy store-add-button"
+                                onClick={() => addToCart(product)}
+                            >
+                                <CartIcon />
+                                Agregar al carrito
+                            </button>
+                        </article>
+                    ))}
+                </div>
+            ) : (
+                <p className="store-empty">No hay productos disponibles en esta categoría.</p>
+            )}
+
+            {count > 0 && (
+                <Link className="store-cart-link" to="/cart">
+                    Ver carrito ({count})
+                </Link>
+            )}
         </section>
     );
 };
