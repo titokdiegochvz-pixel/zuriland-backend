@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { API_URL } from '../config/api';
+import { DiscordIcon, GamepadIcon } from './UiIcons';
 import './ServerHeader.css';
 
 const ServerHeader = () => {
@@ -24,7 +25,7 @@ const ServerHeader = () => {
 
                 <div className="banner-content">
                     <div className="banner-item banner-players">
-                        <span className="banner-icon">🎮</span>
+                        <span className="banner-icon"><GamepadIcon /></span>
 
                         <div>
                             <span className="banner-small">
@@ -59,7 +60,7 @@ const ServerHeader = () => {
                             <strong>DISCORD SERVER</strong>
                         </div>
 
-                        <span className="discord-icon">◉</span>
+                        <span className="discord-icon"><DiscordIcon /></span>
                     </a>
                 </div>
             </header>

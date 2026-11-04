@@ -2,8 +2,29 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../store/CartContext';
 import { STORE_PRODUCTS } from '../store/catalog';
-import { CartIcon } from './UiIcons';
+import {
+    CartIcon,
+    CardIcon,
+    CommandIcon,
+    CrownIcon,
+    DiamondIcon,
+    IronIcon,
+    ShirtIcon,
+} from './UiIcons';
 import './Store.css';
+
+const categoryDetails = {
+    rangos: { label: 'Rangos', Icon: CrownIcon },
+    cosmeticos: { label: 'Cosméticos', Icon: ShirtIcon },
+    comandos: { label: 'Comandos', Icon: CommandIcon },
+};
+
+const getProductIcon = (product) => {
+    if (product.title === 'Elite') return IronIcon;
+    if (product.title === 'Dios') return DiamondIcon;
+    if (product.title === 'Leyenda') return CrownIcon;
+    return CommandIcon;
+};
 
 const Store = () => {
     const [category, setCategory] = useState('rangos');
@@ -20,35 +41,26 @@ const Store = () => {
     return (
         <section className="store-page">
             <div className="store-heading">
-                <h1>Tienda ZURILAND</h1>
+                <span className="store-heading-icon" aria-hidden="true">
+                    <CartIcon />
+                </span>
+                <h1>TIENDA <span>ZURILAND</span></h1>
                 <p>Mejora tu experiencia en el servidor con rangos, kits y beneficios exclusivos.</p>
             </div>
 
             <div className="category-nav" role="group" aria-label="Categorías de la tienda">
-                <button
-                    type="button"
-                    className={category === 'rangos' ? 'active' : ''}
-                    aria-pressed={category === 'rangos'}
-                    onClick={() => setCategory('rangos')}
-                >
-                    Rangos
-                </button>
-                <button
-                    type="button"
-                    className={category === 'cosmeticos' ? 'active' : ''}
-                    aria-pressed={category === 'cosmeticos'}
-                    onClick={() => setCategory('cosmeticos')}
-                >
-                    Cosméticos
-                </button>
-                <button
-                    type="button"
-                    className={category === 'comandos' ? 'active' : ''}
-                    aria-pressed={category === 'comandos'}
-                    onClick={() => setCategory('comandos')}
-                >
-                    Comandos
-                </button>
+                {Object.entries(categoryDetails).map(([id, { label, Icon }]) => (
+                    <button
+                        key={id}
+                        type="button"
+                        className={category === id ? 'active' : ''}
+                        aria-pressed={category === id}
+                        onClick={() => setCategory(id)}
+                    >
+                        <Icon />
+                        {label}
+                    </button>
+                ))}
             </div>
 
             <p className="store-cart-status" role="status" aria-live="polite">
@@ -58,9 +70,15 @@ const Store = () => {
             {products.length ? (
                 <div className="shop-grid">
                     {products.map((product) => (
-                        <article className="rank-card" key={product.title}>
+                        <article
+                            className={`rank-card product-card product-card--${product.title.toLowerCase().replace(/\s+/g, '-')}`}
+                            key={product.title}
+                        >
+                            <span className="product-emblem" aria-hidden="true">
+                                {React.createElement(getProductIcon(product))}
+                            </span>
                             <h2>{product.title}</h2>
-                            <p>{product.description}</p>
+                            <p className="product-description">{product.description}</p>
                             <strong className="store-price">
                                 ${product.price} <span>MXN</span>
                             </strong>
@@ -84,6 +102,11 @@ const Store = () => {
                     Ver carrito ({count})
                 </Link>
             )}
+
+            <p className="store-payment-note">
+                <CardIcon />
+                Opciones de pago con tarjeta y PayPal
+            </p>
         </section>
     );
 };

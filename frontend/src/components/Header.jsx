@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useCart } from '../store/CartContext';
 import { CartIcon, UserIcon } from './UiIcons';
@@ -19,13 +19,14 @@ const Header = () => {
             <nav className="navbar-inner">
                 <div className="navbar-links">
                     {navItems.map((item) => (
-                        <Link
+                        <NavLink
                             key={item.id}
                             to={item.path}
-                            className="nav-link"
+                            end={item.id === 'home'}
+                            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
                         >
                             {item.label}
-                        </Link>
+                        </NavLink>
                     ))}
                 </div>
 
