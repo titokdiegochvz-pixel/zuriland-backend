@@ -49,6 +49,11 @@ return [
         'sync_token' => env('TOWNY_SYNC_TOKEN'),
     ],
 
+    'minecraft' => [
+        'status_url' => env('MINECRAFT_STATUS_URL', 'https://api.mcsrvstat.us/3'),
+        'host' => env('MINECRAFT_SERVER_HOST', 'pgsql-stained.tun.ply.gg'),
+    ],
+
     'frontend' => [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
     ],

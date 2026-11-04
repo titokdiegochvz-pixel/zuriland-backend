@@ -5,7 +5,9 @@ use App\Http\Controllers\TownyRankingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\MinecraftStatusController;
 
+Route::get('/minecraft/status', [MinecraftStatusController::class, 'show'])->middleware('throttle:30,1');
 Route::get('/towny/ranking', [TownyRankingController::class, 'show']);
 Route::post('/towny/ranking', [TownyRankingController::class, 'store'])->middleware('throttle:10,1');
 
