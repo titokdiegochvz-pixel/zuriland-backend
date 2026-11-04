@@ -47,6 +47,41 @@ class TownyTownController extends Controller
                 ],
             $players
         );
+        $playersByName = [];
+        foreach ($players as $player) {
+            $playersByName[strtolower($player['name'])] = $player;
+        }
+
+        $playersFromKillers = DB::table('towny_kill_events')
+            ->selectRaw('LOWER(killer_name) as player_key, MAX(killer_name) as name, COUNT(*) as kills')
+            ->groupByRaw('LOWER(killer_name)')
+            ->get();
+        foreach ($playersFromKillers as $player) {
+            $key = $player->player_key;
+            if (! isset($playersByName[$key])) {
+                $playersByName[$key] = [
+                    'name' => $player->name,
+                    'kills' => (int) $player->kills,
+                    'online' => false,
+                ];
+            }
+        }
+
+        $playersFromVictims = DB::table('towny_kill_events')
+            ->selectRaw('LOWER(victim_name) as player_key, MAX(victim_name) as name')
+            ->groupByRaw('LOWER(victim_name)')
+            ->get();
+        foreach ($playersFromVictims as $player) {
+            $key = $player->player_key;
+            if (! isset($playersByName[$key])) {
+                $playersByName[$key] = [
+                    'name' => $player->name,
+                    'kills' => 0,
+                    'online' => false,
+                ];
+            }
+        }
+        $players = array_values($playersByName);
         $townsByName = [];
 
         foreach ($towns as $town) {

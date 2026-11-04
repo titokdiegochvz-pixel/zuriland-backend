@@ -211,7 +211,11 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonPath('towns.0.name', 'Atlantis')
             ->assertJsonPath('towns.0.players', [])
             ->assertJsonPath('towns.0.kills.0.killer_name', 'Alex')
-            ->assertJsonPath('towns.0.kills.0.victim_name', 'Steve');
+            ->assertJsonPath('towns.0.kills.0.victim_name', 'Steve')
+            ->assertJsonPath('players.0.name', 'Alex')
+            ->assertJsonPath('players.0.kills', 1)
+            ->assertJsonPath('players.1.name', 'Steve')
+            ->assertJsonPath('players.1.kills', 0);
     }
 
     public function test_repeated_kill_event_id_does_not_create_duplicate_rows(): void
