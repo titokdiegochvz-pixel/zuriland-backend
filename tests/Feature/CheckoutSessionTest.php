@@ -85,6 +85,46 @@ class CheckoutSessionTest extends TestCase
         );
     }
 
+    public function test_paypal_cart_order_calculates_total_and_items_from_server_catalog(): void
+    {
+        config([
+            'services.paypal.client_id' => 'sandbox-client',
+            'services.paypal.secret' => 'sandbox-secret',
+        ]);
+        Http::fake([
+            'https://api-m.sandbox.paypal.com/v1/oauth2/token' => Http::response([
+                'access_token' => 'sandbox-access-token',
+            ]),
+            'https://api-m.sandbox.paypal.com/v2/checkout/orders' => Http::response([
+                'id' => 'PAYPAL-CART-123',
+                'links' => [['rel' => 'approve', 'href' => 'https://www.sandbox.paypal.com/checkoutnow?token=PAYPAL-CART-123']],
+            ], 201),
+        ]);
+
+        $this->postJson('/api/paypal/orders', [
+            'items' => [
+                ['title' => 'Dios', 'quantity' => 2],
+                ['title' => 'Elite', 'quantity' => 1],
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('approval_url', 'https://www.sandbox.paypal.com/checkoutnow?token=PAYPAL-CART-123');
+
+        $this->assertDatabaseHas('paypal_orders', [
+            'paypal_order_id' => 'PAYPAL-CART-123',
+            'title' => 'Dios x 2, Elite',
+            'amount' => 247,
+            'status' => 'pending',
+        ]);
+
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/v2/checkout/orders')
+            && data_get($request->data(), 'purchase_units.0.amount.value') === '247.00'
+            && data_get($request->data(), 'purchase_units.0.amount.breakdown.item_total.value') === '247.00'
+            && data_get($request->data(), 'purchase_units.0.items.0.quantity') === '2'
+            && data_get($request->data(), 'purchase_units.0.items.1.unit_amount.value') === '49.00'
+        );
+    }
+
     public function test_paypal_order_rejects_products_outside_the_catalog(): void
     {
         Http::fake();
@@ -92,6 +132,22 @@ class CheckoutSessionTest extends TestCase
         $this->postJson('/api/paypal/orders', ['title' => 'Producto inventado'])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['title']);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_paypal_cart_order_rejects_duplicates_and_invalid_quantities(): void
+    {
+        Http::fake();
+
+        $this->postJson('/api/paypal/orders', [
+            'items' => [
+                ['title' => 'Elite', 'quantity' => 1],
+                ['title' => 'Elite', 'quantity' => 0],
+            ],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['items.1.title', 'items.1.quantity']);
 
         Http::assertNothingSent();
     }

@@ -21,7 +21,10 @@ class PayPalController extends Controller
     public function createOrder(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'title' => ['required_without:items', 'string', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'items' => ['required_without:title', 'array', 'min:1', 'max:5'],
+            'items.*.title' => ['required', 'string', 'distinct', 'in:'.implode(',', array_keys(self::PRODUCTS))],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
         ]);
 
         if (! config('services.paypal.client_id') || ! config('services.paypal.secret')) {
@@ -30,7 +33,25 @@ class PayPalController extends Controller
             ], 503);
         }
 
-        $price = self::PRODUCTS[$validated['title']];
+        $items = isset($validated['items'])
+            ? $validated['items']
+            : [['title' => $validated['title'], 'quantity' => 1]];
+        $price = collect($items)->sum(
+            fn (array $item) => self::PRODUCTS[$item['title']] * $item['quantity']
+        );
+        $title = collect($items)
+            ->map(fn (array $item) => $item['title'].($item['quantity'] > 1 ? " x {$item['quantity']}" : ''))
+            ->implode(', ');
+        $paypalItems = collect($items)
+            ->map(fn (array $item) => [
+                'name' => $item['title'],
+                'quantity' => (string) $item['quantity'],
+                'unit_amount' => [
+                    'currency_code' => 'MXN',
+                    'value' => number_format(self::PRODUCTS[$item['title']], 2, '.', ''),
+                ],
+            ])
+            ->all();
         $accessToken = $this->accessToken();
         $baseUrl = rtrim(config('services.paypal.base_url'), '/');
         $frontendUrl = rtrim(config('services.frontend.url'), '/');
@@ -40,11 +61,18 @@ class PayPalController extends Controller
             ->post("{$baseUrl}/v2/checkout/orders", [
                 'intent' => 'CAPTURE',
                 'purchase_units' => [[
-                    'description' => $validated['title'],
+                    'description' => $title,
                     'amount' => [
                         'currency_code' => 'MXN',
                         'value' => number_format($price, 2, '.', ''),
+                        'breakdown' => [
+                            'item_total' => [
+                                'currency_code' => 'MXN',
+                                'value' => number_format($price, 2, '.', ''),
+                            ],
+                        ],
                     ],
+                    'items' => $paypalItems,
                 ]],
                 'payment_source' => [
                     'paypal' => [
@@ -52,8 +80,8 @@ class PayPalController extends Controller
                             'brand_name' => 'ZURILAND',
                             'locale' => 'es-MX',
                             'user_action' => 'PAY_NOW',
-                            'return_url' => "{$frontendUrl}/store?paypal=success",
-                            'cancel_url' => "{$frontendUrl}/store?paypal=cancelled",
+                            'return_url' => "{$frontendUrl}/cart?paypal=success",
+                            'cancel_url' => "{$frontendUrl}/cart?paypal=cancelled",
                         ],
                     ],
                 ],
@@ -70,7 +98,7 @@ class PayPalController extends Controller
 
         DB::table('paypal_orders')->insert([
             'paypal_order_id' => $orderId,
-            'title' => $validated['title'],
+            'title' => $title,
             'amount' => $price,
             'status' => 'pending',
             'created_at' => now(),
