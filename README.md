@@ -127,7 +127,7 @@ origin. Enter payment-provider credentials directly in Render's environment
 settings; never put them in Git or the frontend.
 
 Towny city pages list all residents and show connection status; publish the
-updated `minecraft-plugin/target/zuriland-towny-sync-1.0.0.jar` to the Minecraft
+updated `minecraft-plugin/target/zuriland-towny-sync-1.0.1.jar` to the Minecraft
 server as well so its roster sync includes offline residents.
 
 ## License
