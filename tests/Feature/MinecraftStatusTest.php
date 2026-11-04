@@ -17,7 +17,7 @@ class MinecraftStatusTest extends TestCase
 
         Cache::flush();
         config([
-            'services.minecraft.status_url' => 'https://api.mcsrvstat.us/3',
+            'services.minecraft.status_url' => 'https://api.mcstatus.io/v2/status/java',
             'services.minecraft.host' => 'pgsql-stained.tun.ply.gg',
         ]);
     }
@@ -25,7 +25,7 @@ class MinecraftStatusTest extends TestCase
     public function test_public_status_returns_the_live_player_count(): void
     {
         Http::fake([
-            'https://api.mcsrvstat.us/3/pgsql-stained.tun.ply.gg' => Http::response([
+            'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg' => Http::response([
                 'online' => true,
                 'players' => ['online' => 1, 'max' => 20],
             ]),
@@ -38,13 +38,13 @@ class MinecraftStatusTest extends TestCase
                 'players' => ['online' => 1, 'max' => 20],
             ]);
 
-        Http::assertSent(fn ($request) => $request->url() === 'https://api.mcsrvstat.us/3/pgsql-stained.tun.ply.gg');
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg');
     }
 
     public function test_public_status_reports_an_offline_server_without_claiming_players_are_online(): void
     {
         Http::fake([
-            'https://api.mcsrvstat.us/3/pgsql-stained.tun.ply.gg' => Http::response([
+            'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg' => Http::response([
                 'online' => false,
             ]),
         ]);
@@ -60,7 +60,7 @@ class MinecraftStatusTest extends TestCase
     public function test_public_status_reports_upstream_errors(): void
     {
         Http::fake([
-            'https://api.mcsrvstat.us/3/pgsql-stained.tun.ply.gg' => Http::response([], 503),
+            'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg' => Http::response([], 503),
         ]);
 
         $this->getJson('/api/minecraft/status')

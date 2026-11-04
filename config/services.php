@@ -50,7 +50,7 @@ return [
     ],
 
     'minecraft' => [
-        'status_url' => env('MINECRAFT_STATUS_URL', 'https://api.mcsrvstat.us/3'),
+        'status_url' => env('MINECRAFT_STATUS_URL', 'https://api.mcstatus.io/v2/status/java'),
         'host' => env('MINECRAFT_SERVER_HOST', 'pgsql-stained.tun.ply.gg'),
     ],
 
