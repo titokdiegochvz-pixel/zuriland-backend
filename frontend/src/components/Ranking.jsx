@@ -149,9 +149,8 @@ const Ranking = () => {
                     <table className="ranking-table">
                         <thead>
                             <tr>
-                                <th scope="col">POS.</th>
+                                <th scope="col">TOP</th>
                                 <th scope="col">JUGADOR</th>
-                                <th scope="col">CIUDAD</th>
                                 <th scope="col">ESTADO</th>
                                 <th scope="col" className="ranking-kills-heading">KILLS</th>
                             </tr>
@@ -159,17 +158,15 @@ const Ranking = () => {
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td className="ranking-message" colSpan="5">Cargando clasificación…</td>
+                                    <td className="ranking-message" colSpan="4">Cargando clasificación…</td>
                                 </tr>
                             ) : players.length ? (
                                 players.map((player, index) => (
                                     <tr key={`${player.town}-${player.name}`}>
                                         <td className="rank-position">
-                                            {index < 3 ? (
-                                                <span className={`ranking-medal ranking-medal--${index + 1}`}>
-                                                    {index + 1}
-                                                </span>
-                                            ) : index + 1}
+                                            <span className={`ranking-medal${index < 3 ? ` ranking-medal--${index + 1}` : ''}`}>
+                                                TOP {index + 1}
+                                            </span>
                                         </td>
                                         <td>
                                             <span className="ranking-player">
@@ -177,7 +174,6 @@ const Ranking = () => {
                                                 <strong>{player.name}</strong>
                                             </span>
                                         </td>
-                                        <td className="ranking-town">{player.town}</td>
                                         <td>
                                             <span className={`ranking-presence ${player.online ? 'is-online' : ''}`}>
                                                 {player.online ? 'En línea' : 'Desconectado'}
@@ -188,7 +184,7 @@ const Ranking = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td className="ranking-message" colSpan="5">
+                                    <td className="ranking-message" colSpan="4">
                                         Aún no hay jugadores sincronizados para clasificar.
                                     </td>
                                 </tr>
