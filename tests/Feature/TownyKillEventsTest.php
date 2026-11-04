@@ -16,8 +16,40 @@ class TownyKillEventsTest extends TestCase
             ->assertOk()
             ->assertExactJson([
                 'towns' => [],
+                'players' => [],
                 'updated_at' => null,
             ]);
+    }
+
+    public function test_town_snapshot_publishes_all_players_including_players_without_a_town(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    [
+                        'name' => 'Atlantis',
+                        'players' => [
+                            ['name' => 'TownResident', 'kills' => 3, 'online' => false],
+                        ],
+                    ],
+                ],
+                'players' => [
+                    ['name' => 'TownResident', 'kills' => 3, 'online' => false],
+                    ['name' => 'NomadPlayer', 'kills' => 19, 'online' => true],
+                ],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonPath('towns.0.players.0.name', 'TownResident')
+            ->assertJsonPath('players.0.name', 'TownResident')
+            ->assertJsonPath('players.0.online', false)
+            ->assertJsonPath('players.1.name', 'NomadPlayer')
+            ->assertJsonPath('players.1.kills', 19)
+            ->assertJsonPath('players.1.online', true);
     }
 
     public function test_authenticated_town_snapshot_is_published(): void

@@ -13,9 +13,40 @@ class TownyTownController extends Controller
     public function index()
     {
         $snapshot = DB::table('towny_town_snapshots')->where('id', 1)->first();
-        $towns = $snapshot
+        $snapshotData = $snapshot
             ? json_decode($snapshot->data, true, 512, JSON_THROW_ON_ERROR)
-            : [];
+            : ['towns' => [], 'players' => []];
+        $towns = array_is_list($snapshotData)
+            ? $snapshotData
+            : ($snapshotData['towns'] ?? []);
+        $players = array_is_list($snapshotData)
+            ? []
+            : ($snapshotData['players'] ?? []);
+
+        if (! $players) {
+            foreach ($towns as $town) {
+                foreach ($town['players'] ?? $town['residents'] ?? [] as $player) {
+                    $players[] = is_string($player)
+                        ? ['name' => $player, 'kills' => 0, 'online' => true]
+                        : [
+                            'name' => $player['name'],
+                            'kills' => (int) ($player['kills'] ?? 0),
+                            'online' => (bool) ($player['online'] ?? true),
+                        ];
+                }
+            }
+        }
+
+        $players = array_map(
+            fn (array|string $player) => is_string($player)
+                ? ['name' => $player, 'kills' => 0, 'online' => true]
+                : [
+                    'name' => $player['name'],
+                    'kills' => (int) $player['kills'],
+                    'online' => (bool) ($player['online'] ?? true),
+                ],
+            $players
+        );
         $townsByName = [];
 
         foreach ($towns as $town) {
@@ -71,6 +102,7 @@ class TownyTownController extends Controller
 
         return response()->json([
             'towns' => $towns,
+            'players' => $players,
             'updated_at' => $updatedAt,
         ]);
     }
@@ -103,6 +135,11 @@ class TownyTownController extends Controller
             'towns.*.players.*.online' => ['sometimes', 'boolean'],
             'towns.*.residents' => ['sometimes', 'array', 'max:10000'],
             'towns.*.residents.*' => ['required', 'string', 'max:16'],
+            'players' => ['sometimes', 'array', 'max:10000'],
+            'players.*' => ['required', 'array:name,kills,online'],
+            'players.*.name' => ['required', 'string', 'max:16'],
+            'players.*.kills' => ['required', 'integer', 'min:0', 'max:1000000000'],
+            'players.*.online' => ['sometimes', 'boolean'],
         ]);
 
         $towns = array_map(function (array $town) {
@@ -124,11 +161,25 @@ class TownyTownController extends Controller
                 'players' => $players,
             ];
         }, $validated['towns']);
+        $players = array_map(
+            fn (array $player) => [
+                'name' => $player['name'],
+                'kills' => $player['kills'],
+                'online' => (bool) ($player['online'] ?? true),
+            ],
+            $validated['players'] ?? array_merge(...array_map(
+                fn (array $town) => $town['players'],
+                $towns ?: [[]]
+            ))
+        );
 
         $now = now();
         $exists = DB::table('towny_town_snapshots')->where('id', 1)->exists();
         $values = [
-            'data' => json_encode($towns, JSON_THROW_ON_ERROR),
+            'data' => json_encode([
+                'towns' => $towns,
+                'players' => $players,
+            ], JSON_THROW_ON_ERROR),
             'updated_at' => $now,
         ];
 

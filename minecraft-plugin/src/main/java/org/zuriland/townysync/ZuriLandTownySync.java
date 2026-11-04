@@ -5,6 +5,7 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.event.EventHandler;
@@ -25,8 +26,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -261,12 +264,49 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
 
     private void syncTownSnapshot() {
         List<TownSnapshot> towns = new ArrayList<>();
+        Set<UUID> npcIds = new HashSet<>();
+        for (Town town : TownyUniverse.getInstance().getTowns()) {
+            for (Resident resident : town.getResidents()) {
+                if (resident.isNPC() && resident.hasUUID()) {
+                    npcIds.add(resident.getUUID());
+                }
+            }
+        }
+
         Map<UUID, PlayerSnapshot> onlinePlayers = new HashMap<>();
+        Map<UUID, PlayerSnapshot> allPlayersById = new HashMap<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            onlinePlayers.put(
-                player.getUniqueId(),
-                new PlayerSnapshot(player.getName(), player.getStatistic(Statistic.PLAYER_KILLS), true)
-            );
+            UUID playerId = player.getUniqueId();
+            if (!npcIds.contains(playerId)) {
+                PlayerSnapshot snapshot = new PlayerSnapshot(
+                    player.getName(),
+                    player.getStatistic(Statistic.PLAYER_KILLS),
+                    true
+                );
+                onlinePlayers.put(playerId, snapshot);
+                allPlayersById.put(playerId, snapshot);
+            }
+        }
+
+        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+            UUID playerId = player.getUniqueId();
+            if (npcIds.contains(playerId) || !player.hasPlayedBefore()) {
+                continue;
+            }
+
+            PlayerSnapshot onlinePlayer = onlinePlayers.get(playerId);
+            if (onlinePlayer != null) {
+                allPlayersById.put(playerId, onlinePlayer);
+                continue;
+            }
+
+            String name = player.getName();
+            if (name != null && !name.isBlank()) {
+                allPlayersById.put(
+                    playerId,
+                    new PlayerSnapshot(name, player.getStatistic(Statistic.PLAYER_KILLS), false)
+                );
+            }
         }
 
         for (Town town : TownyUniverse.getInstance().getTowns()) {
@@ -286,6 +326,9 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         }
 
         towns.sort(Comparator.comparing(TownSnapshot::name, String.CASE_INSENSITIVE_ORDER));
+        List<PlayerSnapshot> allPlayers = allPlayersById.values().stream()
+            .sorted(Comparator.comparing(PlayerSnapshot::name, String.CASE_INSENSITIVE_ORDER))
+            .toList();
         StringBuilder json = new StringBuilder("{\"towns\":[");
         for (int townIndex = 0; townIndex < towns.size(); townIndex++) {
             if (townIndex > 0) {
@@ -295,28 +338,36 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             TownSnapshot town = towns.get(townIndex);
             json.append("{\"name\":\"")
                 .append(escapeJson(town.name()))
-                .append("\",\"players\":[");
-            for (int playerIndex = 0; playerIndex < town.players().size(); playerIndex++) {
-                if (playerIndex > 0) {
-                    json.append(',');
-                }
-                PlayerSnapshot player = town.players().get(playerIndex);
-                json.append("{\"name\":\"")
-                    .append(escapeJson(player.name()))
-                    .append("\",\"kills\":")
-                    .append(player.kills())
-                    .append(",\"online\":")
-                    .append(player.online())
-                    .append('}');
-            }
-            json.append("]}");
+                .append("\",\"players\":");
+            appendPlayerSnapshots(json, town.players());
+            json.append('}');
         }
 
-        String payload = json.append("]}").toString();
+        json.append("],\"players\":");
+        appendPlayerSnapshots(json, allPlayers);
+        String payload = json.append('}').toString();
         Bukkit.getScheduler().runTaskAsynchronously(
             this,
             () -> sendTownSnapshot(payload, towns.size())
         );
+    }
+
+    private void appendPlayerSnapshots(StringBuilder json, List<PlayerSnapshot> players) {
+        json.append('[');
+        for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
+            if (playerIndex > 0) {
+                json.append(',');
+            }
+            PlayerSnapshot player = players.get(playerIndex);
+            json.append("{\"name\":\"")
+                .append(escapeJson(player.name()))
+                .append("\",\"kills\":")
+                .append(player.kills())
+                .append(",\"online\":")
+                .append(player.online())
+                .append('}');
+        }
+        json.append(']');
     }
 
     private long nationKills(Nation nation) {

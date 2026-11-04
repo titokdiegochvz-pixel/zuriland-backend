@@ -50,28 +50,29 @@ const Ranking = () => {
                     throw new Error('Invalid Towny ranking response');
                 }
 
-                const rankedPlayers = data.towns.flatMap((town) => {
-                    if (typeof town.name !== 'string' || !Array.isArray(town.players)) {
-                        throw new Error('Invalid Towny ranking response');
+                const sourcePlayers = Array.isArray(data.players)
+                    ? data.players
+                    : data.towns.flatMap((town) => {
+                        if (typeof town.name !== 'string' || !Array.isArray(town.players)) {
+                            throw new Error('Invalid Towny ranking response');
+                        }
+                        return town.players;
+                    });
+                const rankedPlayers = sourcePlayers.map((player) => {
+                    const kills = Number(player.kills);
+                    if (
+                        typeof player.name !== 'string'
+                        || !Number.isFinite(kills)
+                        || kills < 0
+                    ) {
+                        throw new Error('Invalid Towny player ranking');
                     }
 
-                    return town.players.map((player) => {
-                        const kills = Number(player.kills);
-                        if (
-                            typeof player.name !== 'string'
-                            || !Number.isFinite(kills)
-                            || kills < 0
-                        ) {
-                            throw new Error('Invalid Towny player ranking');
-                        }
-
-                        return {
-                            name: player.name,
-                            town: town.name,
-                            kills,
-                            online: Boolean(player.online),
-                        };
-                    });
+                    return {
+                        name: player.name,
+                        kills,
+                        online: Boolean(player.online),
+                    };
                 }).sort((first, second) =>
                     second.kills - first.kills
                     || first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
@@ -162,7 +163,7 @@ const Ranking = () => {
                                 </tr>
                             ) : players.length ? (
                                 players.map((player, index) => (
-                                    <tr key={`${player.town}-${player.name}`}>
+                                    <tr key={player.name}>
                                         <td className="rank-position">
                                             <span className={`ranking-medal${index < 3 ? ` ranking-medal--${index + 1}` : ''}`}>
                                                 TOP {index + 1}
