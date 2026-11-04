@@ -67,4 +67,58 @@ class MinecraftStatusTest extends TestCase
             ->assertServiceUnavailable()
             ->assertJsonPath('message', 'No se pudo consultar el estado del servidor Minecraft.');
     }
+
+    public function test_authenticated_plugin_push_is_returned_as_the_current_status(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/minecraft/status', [
+                'online' => true,
+                'players' => ['online' => 3, 'max' => 120],
+            ])
+            ->assertOk()
+            ->assertJsonPath('message', 'Estado de Minecraft sincronizado.');
+
+        Http::fake();
+
+        $this->getJson('/api/minecraft/status')
+            ->assertOk()
+            ->assertExactJson([
+                'online' => true,
+                'players' => ['online' => 3, 'max' => 120],
+            ]);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_plugin_push_requires_the_towny_sync_token(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $payload = [
+            'online' => true,
+            'players' => ['online' => 2, 'max' => 120],
+        ];
+
+        $this->postJson('/api/minecraft/status', $payload)
+            ->assertUnauthorized();
+
+        $this->withToken('wrong-token')
+            ->postJson('/api/minecraft/status', $payload)
+            ->assertUnauthorized();
+    }
+
+    public function test_plugin_push_validates_player_counts(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/minecraft/status', [
+                'online' => true,
+                'players' => ['online' => -1, 'max' => 120],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['players.online']);
+    }
 }

@@ -3,6 +3,10 @@ package org.zuriland.townysync;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Nation;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -16,11 +20,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 
-public final class ZuriLandTownySync extends JavaPlugin {
+public final class ZuriLandTownySync extends JavaPlugin implements Listener {
     private HttpClient httpClient;
     private URI endpoint;
+    private URI playerStatusEndpoint;
     private String syncToken;
     private int syncIntervalSeconds;
+    private int playerSyncIntervalSeconds;
 
     @Override
     public void onEnable() {
@@ -29,6 +35,7 @@ public final class ZuriLandTownySync extends JavaPlugin {
         String apiUrl = getConfig().getString("api-url", "").trim();
         syncToken = getConfig().getString("sync-token", "").trim();
         syncIntervalSeconds = getConfig().getInt("sync-interval-seconds", 300);
+        playerSyncIntervalSeconds = getConfig().getInt("player-sync-interval-seconds", 5);
 
         if (apiUrl.isEmpty() || syncToken.isEmpty()) {
             getLogger().severe("Set api-url and sync-token in plugins/ZuriLandTownySync/config.yml.");
@@ -42,6 +49,12 @@ public final class ZuriLandTownySync extends JavaPlugin {
             return;
         }
 
+        if (playerSyncIntervalSeconds < 5) {
+            getLogger().severe("player-sync-interval-seconds must be at least 5.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         try {
             URI baseUri = URI.create(apiUrl.replaceAll("/+$", ""));
             if (!"https".equalsIgnoreCase(baseUri.getScheme()) || baseUri.getHost() == null) {
@@ -50,6 +63,7 @@ public final class ZuriLandTownySync extends JavaPlugin {
                 return;
             }
             endpoint = baseUri.resolve("/api/towny/ranking");
+            playerStatusEndpoint = baseUri.resolve("/api/minecraft/status");
         } catch (IllegalArgumentException exception) {
             getLogger().log(Level.SEVERE, "api-url is not a valid URL.", exception);
             getServer().getPluginManager().disablePlugin(this);
@@ -67,7 +81,64 @@ public final class ZuriLandTownySync extends JavaPlugin {
             20L,
             intervalTicks
         );
+        Bukkit.getScheduler().runTaskTimer(
+            this,
+            this::syncPlayerCount,
+            20L,
+            playerSyncIntervalSeconds * 20L
+        );
+        getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("Towny rankings will sync to ZuriLand every " + syncIntervalSeconds + " seconds.");
+        getLogger().info("Minecraft player counts will sync to ZuriLand every " + playerSyncIntervalSeconds + " seconds.");
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        syncPlayerCountNextTick();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        syncPlayerCountNextTick();
+    }
+
+    private void syncPlayerCountNextTick() {
+        Bukkit.getScheduler().runTask(this, this::syncPlayerCount);
+    }
+
+    private void syncPlayerCount() {
+        int onlinePlayers = Bukkit.getOnlinePlayers().size();
+        int maxPlayers = Bukkit.getMaxPlayers();
+        String payload = "{\"online\":true,\"players\":{\"online\":" + onlinePlayers
+            + ",\"max\":" + maxPlayers + "}}";
+
+        Bukkit.getScheduler().runTaskAsynchronously(
+            this,
+            () -> sendPlayerCount(payload, onlinePlayers)
+        );
+    }
+
+    private void sendPlayerCount(String payload, int onlinePlayers) {
+        HttpRequest request = HttpRequest.newBuilder(playerStatusEndpoint)
+            .timeout(Duration.ofSeconds(10))
+            .header("Authorization", "Bearer " + syncToken)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+
+        try {
+            HttpResponse<Void> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                getLogger().fine("Synced the Minecraft player count (" + onlinePlayers + ").");
+            } else {
+                getLogger().warning("Minecraft player count sync failed with HTTP " + response.statusCode() + ".");
+            }
+        } catch (IOException exception) {
+            getLogger().log(Level.WARNING, "Could not send the Minecraft player count to ZuriLand.", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            getLogger().log(Level.WARNING, "Minecraft player count sync was interrupted.", exception);
+        }
     }
 
     private void syncSnapshot() {

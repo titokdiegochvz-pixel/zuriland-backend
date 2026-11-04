@@ -1,5 +1,5 @@
 name: ZuriLandTownySync
 version: '${project.version}'
 main: org.zuriland.townysync.ZuriLandTownySync
-description: Publishes Towny nation rankings to the ZuriLand website.
+description: Publishes Towny rankings and Minecraft player counts to the ZuriLand website.
 depend: [Towny]
