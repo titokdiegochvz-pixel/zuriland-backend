@@ -43,12 +43,18 @@ class TownyRankingController extends Controller
             'nations.*.towns' => ['required', 'integer', 'min:0', 'max:100000'],
             'nations.*.residents' => ['required', 'integer', 'min:0', 'max:1000000'],
             'nations.*.land' => ['required', 'integer', 'min:0', 'max:100000000'],
+            'nations.*.kills' => ['sometimes', 'required', 'integer', 'min:0', 'max:1000000000'],
         ]);
+
+        $nations = array_map(
+            fn (array $nation) => [...$nation, 'kills' => $nation['kills'] ?? 0],
+            $validated['nations']
+        );
 
         $now = now();
         $exists = DB::table('towny_ranking_snapshots')->where('id', 1)->exists();
         $values = [
-            'data' => json_encode($validated['nations'], JSON_THROW_ON_ERROR),
+            'data' => json_encode($nations, JSON_THROW_ON_ERROR),
             'updated_at' => $now,
         ];
 

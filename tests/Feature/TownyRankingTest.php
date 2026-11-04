@@ -52,6 +52,7 @@ class TownyRankingTest extends TestCase
                     'towns' => 3,
                     'residents' => 18,
                     'land' => 42,
+                    'kills' => 127,
                 ],
             ],
         ];
@@ -73,7 +74,28 @@ class TownyRankingTest extends TestCase
             ->assertJsonPath('nations.0.towns', 3)
             ->assertJsonPath('nations.0.residents', 18)
             ->assertJsonPath('nations.0.land', 42)
+            ->assertJsonPath('nations.0.kills', 127)
             ->assertJsonStructure(['updated_at']);
+    }
+
+    public function test_towny_sync_defaults_kills_for_older_plugins(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/ranking', [
+                'nations' => [[
+                    'name' => 'Zuri',
+                    'towns' => 3,
+                    'residents' => 18,
+                    'land' => 42,
+                ]],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/ranking')
+            ->assertOk()
+            ->assertJsonPath('nations.0.kills', 0);
     }
 
     public function test_towny_sync_validates_the_complete_snapshot_before_writing(): void

@@ -2,7 +2,9 @@ package org.zuriland.townysync;
 
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Resident;
 import org.bukkit.Bukkit;
+import org.bukkit.Statistic;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -157,7 +159,8 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
                 nation.getName(),
                 nation.getTowns().size(),
                 nation.getResidents().size(),
-                nation.getTownBlocks().size()
+                nation.getTownBlocks().size(),
+                nationKills(nation)
             ));
         }
 
@@ -178,9 +181,24 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
                 .append(nation.residents())
                 .append(",\"land\":")
                 .append(nation.land())
+                .append(",\"kills\":")
+                .append(nation.kills())
                 .append('}');
         }
         return new Snapshot(json.append("]}").toString(), nations.size());
+    }
+
+    private long nationKills(Nation nation) {
+        long kills = 0;
+
+        for (Resident resident : nation.getResidents()) {
+            if (!resident.isNPC() && resident.hasUUID()) {
+                kills += Bukkit.getOfflinePlayer(resident.getUUID())
+                    .getStatistic(Statistic.PLAYER_KILLS);
+            }
+        }
+
+        return kills;
     }
 
     private void sendSnapshot(String payload, int nationCount) {
@@ -230,7 +248,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         return escaped.toString();
     }
 
-    private record NationSnapshot(String name, int towns, int residents, int land) {
+    private record NationSnapshot(String name, int towns, int residents, int land, long kills) {
     }
 
     private record Snapshot(String payload, int nationCount) {

@@ -1,6 +1,6 @@
 # ZuriLand Towny Sync
 
-This Paper plugin reads nation, town, resident, and claimed-plot counts from Towny 0.103.2.0 and sends a snapshot to the ZuriLand API over HTTPS. It also sends the online player count every five seconds and immediately after a player joins or leaves. The Minecraft server makes the outbound connection; no inbound ports or direct website access to the game server/database are required.
+This Paper plugin reads nation, town, resident, and claimed-plot counts from Towny 0.103.2.0, adds each nation's total player kills, and sends a snapshot to the ZuriLand API over HTTPS. It also sends the online player count every five seconds and immediately after a player joins or leaves. The Minecraft server makes the outbound connection; no inbound ports or direct website access to the game server/database are required.
 
 ## Build
 
