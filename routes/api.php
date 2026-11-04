@@ -15,7 +15,7 @@ Route::get('/towny/ranking', [TownyRankingController::class, 'show']);
 Route::post('/towny/ranking', [TownyRankingController::class, 'store'])->middleware('throttle:towny-ranking-sync');
 Route::get('/towny/kills', [TownyTownController::class, 'index'])->middleware('throttle:120,1');
 Route::post('/towny/kills', [TownyKillController::class, 'store'])->middleware('throttle:600,1');
-Route::post('/towny/towns', [TownyTownController::class, 'store'])->middleware('throttle:10,1');
+Route::post('/towny/towns', [TownyTownController::class, 'store'])->middleware('throttle:towny-town-sync');
 
 Route::post('/create-checkout-session', [CheckoutController::class, 'create']);
 Route::post('/paypal/orders', [PayPalController::class, 'createOrder'])->middleware('throttle:10,1');

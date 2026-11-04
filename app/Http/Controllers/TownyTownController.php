@@ -92,11 +92,11 @@ class TownyTownController extends Controller
         $validated = $request->validate([
             'towns' => ['required', 'array', 'max:1000'],
             'towns.*.name' => ['required', 'string', 'max:100'],
-            'towns.*.players' => ['sometimes', 'required', 'array', 'max:10000'],
+            'towns.*.players' => ['sometimes', 'array', 'max:10000'],
             'towns.*.players.*' => ['required', 'array:name,kills'],
             'towns.*.players.*.name' => ['required', 'string', 'max:16'],
             'towns.*.players.*.kills' => ['required', 'integer', 'min:0', 'max:1000000000'],
-            'towns.*.residents' => ['sometimes', 'required', 'array', 'max:10000'],
+            'towns.*.residents' => ['sometimes', 'array', 'max:10000'],
             'towns.*.residents.*' => ['required', 'string', 'max:16'],
         ]);
 

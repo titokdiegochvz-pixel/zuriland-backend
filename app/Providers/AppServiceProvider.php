@@ -28,5 +28,12 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)
                 ->by('towny-ranking-sync:'.hash('sha256', $syncToken));
         });
+
+        RateLimiter::for('towny-town-sync', function (Request $request) {
+            $syncToken = (string) config('services.towny.sync_token');
+
+            return Limit::perMinute(120)
+                ->by('towny-town-sync:'.hash('sha256', $syncToken));
+        });
     }
 }
