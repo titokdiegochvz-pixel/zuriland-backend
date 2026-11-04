@@ -1,6 +1,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { API_URL } from '../config/api';
+import {
+    ArrowRightIcon,
+    BookIcon,
+    FlagIcon,
+    TrophyIcon,
+    UsersIcon,
+} from './UiIcons';
 import './Community.css';
 
 const PlayerSkin = ({ name }) => {
@@ -98,43 +105,123 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
         })
         : null;
 
+    const highlightedTowns = snapshot?.towns
+        ? [...snapshot.towns]
+            .sort((first, second) => (second.players?.length || 0) - (first.players?.length || 0))
+            .slice(0, 3)
+        : [];
+
     return (
         <section className="community-section">
-            <div className="community-card">
-                <div className="community-icon">🌐</div>
+            <div className="community-content">
+                <header className="community-card">
+                    <div className="community-icon"><UsersIcon /></div>
 
-                <span className="community-eyebrow">
-                    COMPETICIÓN GLOBAL
-                </span>
+                    <span className="community-eyebrow">
+                        COMUNIDAD ZURILAND
+                    </span>
 
-                <h2>Comunidad</h2>
+                    <h1>Comunidad</h1>
 
-                <p>
-                    Explora las naciones, consulta las clasificaciones
-                    y descubre las reglas de nuestro servidor.
-                </p>
+                    <p>
+                        Explora las naciones, consulta las clasificaciones y mantente al día
+                        con las reglas, eventos y guerras del servidor.
+                    </p>
 
-                <div className="community-actions">
+                    <div className="community-actions">
+                        <button
+                            type="button"
+                            className="community-button ranking-button"
+                            onClick={onOpenRanking}
+                        >
+                            <TrophyIcon />
+                            Tabla de clasificación
+                            <ArrowRightIcon className="button-arrow" />
+                        </button>
+
+                        <button
+                            type="button"
+                            className="community-button rules-button"
+                            onClick={onOpenRules}
+                        >
+                            <BookIcon />
+                            Reglas
+                            <ArrowRightIcon className="button-arrow" />
+                        </button>
+                    </div>
+                </header>
+
+                <nav className="community-shortcuts" aria-label="Explora la comunidad">
+                    <a className="community-shortcut" href="#town-cities">
+                        <span className="shortcut-icon"><FlagIcon /></span>
+                        <span>
+                            <strong>Naciones</strong>
+                            <small>Conoce las ciudades de Towny.</small>
+                        </span>
+                    </a>
+                    <a className="community-shortcut" href="#town-roster">
+                        <span className="shortcut-icon"><UsersIcon /></span>
+                        <span>
+                            <strong>Residentes</strong>
+                            <small>Consulta jugadores y su estado.</small>
+                        </span>
+                    </a>
                     <button
-                        className="community-button ranking-button"
+                        type="button"
+                        className="community-shortcut"
                         onClick={onOpenRanking}
                     >
-                        <span>🏆</span>
-                        Tabla de clasificación
-                        <span className="button-arrow">→</span>
+                        <span className="shortcut-icon"><TrophyIcon /></span>
+                        <span>
+                            <strong>Clasificación</strong>
+                            <small>Compara las estadísticas.</small>
+                        </span>
                     </button>
+                </nav>
 
-                    <button
-                        className="community-button rules-button"
-                        onClick={onOpenRules}
-                    >
-                        <span>📜</span>
-                        Reglas
-                        <span className="button-arrow">→</span>
-                    </button>
-                </div>
+                <section className="featured-towns" id="town-cities" aria-labelledby="featured-towns-title">
+                    <div className="community-section-heading">
+                        <span />
+                        <h2 id="featured-towns-title">Ciudades de Towny</h2>
+                        <span />
+                    </div>
 
-                <div className="town-roster" aria-labelledby="town-roster-title">
+                    {isLoading ? (
+                        <div className="featured-town-loading" aria-label="Cargando ciudades">
+                            {[0, 1, 2].map((item) => (
+                                <div className="featured-town-skeleton" key={item} />
+                            ))}
+                        </div>
+                    ) : highlightedTowns.length ? (
+                        <div className="featured-town-grid">
+                            {highlightedTowns.map((town, index) => {
+                                const onlineCount = (town.players || []).filter((player) => player.online).length;
+                                return (
+                                    <a
+                                        className={`featured-town-card featured-town-card--${index + 1}`}
+                                        href={`#town-${snapshot.towns.indexOf(town)}`}
+                                        key={town.name}
+                                    >
+                                        <span className="town-rank">{index + 1}</span>
+                                        <span className="town-emblem"><FlagIcon /></span>
+                                        <span className="featured-town-copy">
+                                            <strong>{town.name}</strong>
+                                            <small>{town.players?.length || 0} residentes</small>
+                                        </span>
+                                        <span className="town-online-count">
+                                            <strong>{onlineCount}</strong>
+                                            <small>en línea</small>
+                                        </span>
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p className="featured-town-empty">Aún no hay ciudades disponibles.</p>
+                    )}
+                </section>
+
+                <section className="town-roster" id="town-roster" aria-labelledby="town-roster-title">
                     <div className="roster-toolbar">
                         <div>
                             <h3 id="town-roster-title">Jugadores de Towny</h3>
@@ -180,14 +267,14 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         </div>
                     ) : snapshot?.towns.length ? (
                         <div className="town-list">
-                            {snapshot.towns.map((town) => {
+                            {snapshot.towns.map((town, index) => {
                                 const players = [...(town.players || [])].sort((first, second) =>
                                     first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
                                 );
                                 const onlineCount = players.filter((player) => player.online).length;
 
                                 return (
-                                    <section className="town-group" key={town.name}>
+                                    <section className="town-group" id={`town-${index}`} key={town.name}>
                                         <div className="town-heading">
                                             <h4>{town.name}</h4>
                                             <span>
@@ -221,7 +308,7 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                     ) : !error ? (
                         <p className="roster-empty">Aún no hay ciudades disponibles.</p>
                     ) : null}
-                </div>
+                </section>
             </div>
         </section>
     );

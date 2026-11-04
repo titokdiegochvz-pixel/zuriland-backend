@@ -116,3 +116,28 @@ export const DiscordIcon = () => (
         <path d="M9 12.5h.01M15 12.5h.01M8 16c2.5 1.2 5.5 1.2 8 0" />
     </svg>
 );
+
+export const GlobeIcon = () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18m-9-9a15 15 0 0 1 0 18m0-18a15 15 0 0 0 0 18" />
+    </svg>
+);
+
+export const FlagIcon = () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 21V5m0 1c5-4 9 3 14-1v10c-5 4-9-3-14 1" />
+    </svg>
+);
+
+export const TrophyIcon = () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0V4Zm0 2H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4" />
+    </svg>
+);
+
+export const ArrowRightIcon = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12h15m-6-6 6 6-6 6" />
+    </svg>
+);

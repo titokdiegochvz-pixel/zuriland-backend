@@ -1,66 +1,133 @@
-
 .community-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 20px;
+    display: block;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 26px 20px 48px;
+    color: #f5f4ff;
+    background:
+        radial-gradient(ellipse at 50% 4%, rgba(77, 37, 145, 0.14), transparent 34rem),
+        #0a0d18;
+}
+
+.community-content {
+    width: min(1010px, 100%);
+    margin: 0 auto;
 }
 
 .community-card {
-    width: 100%;
-    max-width: 700px;
-    padding: 42px 28px;
-    text-align: center;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(836px, 100%);
+    min-height: 270px;
+    box-sizing: border-box;
+    margin: 0 auto 21px;
+    padding: 17px 28px 18px;
+    overflow: hidden;
+    border: 1px solid #6330a4;
+    border-radius: 17px;
     background:
-        radial-gradient(ellipse at top left, #7c3aed25, transparent 60%),
-        radial-gradient(ellipse at bottom right, #2563eb25, transparent 60%),
-        #0b1020;
-    border: 1px solid #37306b;
-    border-radius: 18px;
-    box-shadow: 0 10px 40px #0004;
+        radial-gradient(ellipse at 8% 100%, rgba(128, 28, 206, 0.3), transparent 45%),
+        radial-gradient(ellipse at 100% 0%, rgba(82, 31, 166, 0.37), transparent 39%),
+        linear-gradient(120deg, #17132d, #111a31 76%);
+    box-shadow: 0 15px 34px rgba(0, 0, 0, 0.18);
+    text-align: center;
+}
+
+.community-card::before,
+.community-card::after {
+    position: absolute;
+    z-index: -1;
+    width: 235px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #b23dff 55%, #9a3df0);
+    box-shadow: 0 0 14px rgba(151, 60, 242, 0.8);
+    content: "";
+    pointer-events: none;
+}
+
+.community-card::before {
+    top: 127px;
+    left: -52px;
+    transform: rotate(-48deg);
+}
+
+.community-card::after {
+    top: 48px;
+    right: -49px;
+    transform: rotate(-48deg);
 }
 
 .community-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 68px;
-    height: 68px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #7c3aed, #2563eb);
-    border: 1px solid #a5b4fc;
-    border-radius: 18px;
-    font-size: 32px;
-    box-shadow: 0 0 30px #6366f144;
+    display: grid;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
+    place-items: center;
+    border: 1px solid #aa66fc;
+    border-radius: 17px;
+    color: #e8d5ff;
+    background: linear-gradient(145deg, #a52dea, #4543df);
+    box-shadow: 0 8px 20px rgba(125, 53, 223, 0.4);
+}
+
+.community-icon svg {
+    width: 35px;
+    height: 35px;
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
 }
 
 .community-eyebrow {
-    color: #a5b4fc;
-    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ddd1f5;
+    font-size: 9px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
 }
 
-.community-card h2 {
-    margin: 10px 0 12px;
-    color: #f1f5ff;
-    font-size: 30px;
-    font-weight: 800;
+.community-eyebrow::before,
+.community-eyebrow::after {
+    width: 62px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #9f54e8);
+    content: "";
 }
 
-.community-card p {
-    max-width: 420px;
-    margin: 0 auto 28px;
-    color: #9ca9c9;
-    font-size: 14px;
-    line-height: 1.8;
+.community-eyebrow::after {
+    transform: rotate(180deg);
+}
+
+.community-card h1 {
+    margin: 9px 0 5px;
+    color: #fbfaff;
+    font-size: clamp(26px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.community-card > p {
+    max-width: 60ch;
+    margin: 0 auto 15px;
+    color: #d1d0df;
+    font-size: 13px;
+    line-height: 1.65;
 }
 
 .community-actions {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 28px;
 }
 
 .community-button {
@@ -68,50 +135,329 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-    padding: 14px 18px;
+    min-width: 175px;
+    min-height: 45px;
+    padding: 10px 19px;
+    border: 1px solid #9255ea;
+    border-radius: 12px;
     color: #fff;
-    border: 1px solid transparent;
-    border-radius: 10px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 750;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.community-button svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.community-button.ranking-button > svg:first-child {
+    color: #ffdb61;
 }
 
 .ranking-button {
-    background: linear-gradient(110deg, #7c3aed, #2563eb);
-    border-color: #818cf8;
-    box-shadow: 0 4px 18px #4f46e533;
+    background: linear-gradient(105deg, #9928e9, #345fea);
+    box-shadow: 0 7px 18px rgba(103, 47, 205, 0.24);
 }
 
 .rules-button {
-    background: linear-gradient(110deg, #312e81, #1d4ed8);
-    border-color: #4f63c8;
+    background: linear-gradient(105deg, #642fc4, #275ad8);
 }
 
 .community-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px #6366f155;
+    box-shadow: 0 10px 22px rgba(124, 57, 214, 0.34);
 }
 
-.community-button:focus-visible {
-    outline: 2px solid #c4b5fd;
-    outline-offset: 4px;
+.community-button:focus-visible,
+.community-shortcut:focus-visible,
+.featured-town-card:focus-visible,
+.roster-refresh:focus-visible,
+.roster-error button:focus-visible {
+    outline: 2px solid #d6b2ff;
+    outline-offset: 3px;
 }
 
 .button-arrow {
-    font-size: 18px;
-    transition: transform 0.2s ease;
+    width: 17px !important;
+    height: 17px !important;
+    margin-left: 1px;
 }
 
-.community-button:hover .button-arrow {
-    transform: translateX(3px);
+.community-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0 auto 29px;
+}
+
+.community-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 76px;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border: 1px solid #583292;
+    border-radius: 12px;
+    color: inherit;
+    background: linear-gradient(125deg, rgba(33, 27, 55, 0.96), rgba(17, 26, 47, 0.96));
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
+}
+
+.community-shortcut:hover {
+    transform: translateY(-2px);
+    border-color: #9c58e4;
+    background: linear-gradient(125deg, #2c2046, #182543);
+}
+
+.shortcut-icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(173, 90, 255, 0.5);
+    border-radius: 50%;
+    color: #df76ff;
+    background: #251b3b;
+    box-shadow: 0 0 16px rgba(166, 75, 235, 0.2);
+}
+
+.shortcut-icon svg {
+    width: 27px;
+    height: 27px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.community-shortcut > span:last-child {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.community-shortcut strong {
+    color: #fbfaff;
+    font-size: 14px;
+}
+
+.community-shortcut small {
+    color: #c5c3d5;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.community-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin: 0 auto 18px;
+}
+
+.community-section-heading > span {
+    width: min(120px, 17vw);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #7736bd);
+}
+
+.community-section-heading > span:last-child {
+    transform: rotate(180deg);
+}
+
+.community-section-heading h2 {
+    margin: 0;
+    color: #f5f3ff;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+.featured-towns {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 30px;
+    padding: 0;
+    text-align: left;
+}
+
+.featured-town-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.featured-town-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 82px;
+    box-sizing: border-box;
+    padding: 13px 15px 13px 26px;
+    border: 1px solid #6c5492;
+    border-radius: 12px;
+    color: inherit;
+    background: linear-gradient(120deg, #191b2c, #111726);
+    text-decoration: none;
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.featured-town-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(0, 0, 0, 0.24);
+}
+
+.featured-town-card--1 {
+    border-color: #d8a931;
+}
+
+.featured-town-card--2 {
+    border-color: #7889a1;
+}
+
+.featured-town-card--3 {
+    border-color: #bd7136;
+}
+
+.town-rank {
+    position: absolute;
+    top: -1px;
+    left: 10px;
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    transform: translateY(-1px);
+    border-radius: 0 0 13px 13px;
+    color: #251b08;
+    background: #efbd43;
+    font-size: 13px;
+    font-weight: 850;
+}
+
+.featured-town-card--2 .town-rank {
+    color: #172131;
+    background: #b7c8dd;
+}
+
+.featured-town-card--3 .town-rank {
+    color: #2b160a;
+    background: #c77b42;
+}
+
+.town-emblem {
+    display: grid;
+    width: 44px;
+    height: 50px;
+    flex: 0 0 auto;
+    place-items: center;
+    color: #ffcb45;
+}
+
+.featured-town-card--2 .town-emblem {
+    color: #c2d0e3;
+}
+
+.featured-town-card--3 .town-emblem {
+    color: #84bd75;
+}
+
+.town-emblem svg {
+    width: 43px;
+    height: 43px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+}
+
+.featured-town-copy,
+.town-online-count {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+}
+
+.featured-town-copy {
+    flex: 1;
+}
+
+.featured-town-copy strong {
+    overflow: hidden;
+    color: #f7f5ff;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.featured-town-copy small,
+.town-online-count small {
+    color: #c5c4d2;
+    font-size: 10px;
+}
+
+.town-online-count {
+    justify-items: center;
+    min-width: 44px;
+    text-align: center;
+}
+
+.town-online-count strong {
+    color: #f5f2ff;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.featured-town-empty {
+    margin: 0;
+    padding: 22px;
+    border: 1px solid #463161;
+    border-radius: 12px;
+    color: #c5c3d5;
+    background: #151526;
+    font-size: 13px;
+    text-align: center;
+}
+
+.featured-town-loading {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.featured-town-skeleton {
+    height: 82px;
+    border: 1px solid #39304f;
+    border-radius: 12px;
+    background: linear-gradient(100deg, #171827 25%, #222138 45%, #171827 65%);
+    background-size: 300% 100%;
+    animation: roster-shimmer 1.7s ease-in-out infinite;
 }
 
 .town-roster {
-    margin-top: 34px;
-    padding-top: 27px;
-    border-top: 1px solid #34304f;
+    margin: 0;
+    padding: 23px 24px;
+    border: 1px solid #49326a;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #141727, #101421);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+    scroll-margin-top: 20px;
     text-align: left;
 }
 
@@ -124,15 +470,15 @@
 
 .roster-toolbar h3 {
     margin: 0;
-    color: #f1f5ff;
-    font-size: 19px;
+    color: #f5f2ff;
+    font-size: 18px;
     font-weight: 750;
 }
 
 .roster-toolbar p {
     margin: 7px 0 0;
-    color: #aab5d0;
-    font-size: 13px;
+    color: #c4c4d4;
+    font-size: 12px;
     line-height: 1.5;
 }
 
@@ -142,9 +488,9 @@
     align-items: center;
     gap: 7px;
     padding: 8px 10px;
-    color: #d7d9ff;
-    background: #17172a;
-    border: 1px solid #45416b;
+    color: #e0d1f6;
+    background: #1c1b2e;
+    border: 1px solid #51406e;
     border-radius: 8px;
     font: inherit;
     font-size: 12px;
@@ -164,14 +510,8 @@
 }
 
 .roster-refresh:hover:not(:disabled) {
-    background: #24213d;
-    border-color: #8b83c6;
-}
-
-.roster-refresh:focus-visible,
-.roster-error button:focus-visible {
-    outline: 2px solid #c4b5fd;
-    outline-offset: 3px;
+    background: #29233d;
+    border-color: #9b76c9;
 }
 
 .roster-refresh:disabled {
@@ -181,17 +521,25 @@
 
 .roster-updated {
     margin: 13px 0 0 !important;
-    color: #aab5d0 !important;
-    font-size: 12px !important;
+    color: #c1bfd0 !important;
+    font-size: 11px !important;
     line-height: 1.4 !important;
 }
 
 .town-list {
-    margin-top: 17px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 15px;
 }
 
-.town-group + .town-group {
-    margin-top: 21px;
+.town-group {
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #34314e;
+    border-radius: 10px;
+    background: rgba(15, 18, 32, 0.72);
+    scroll-margin-top: 18px;
 }
 
 .town-heading {
@@ -200,18 +548,18 @@
     align-items: baseline;
     gap: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #292d43;
+    border-bottom: 1px solid #302d46;
 }
 
 .town-heading h4 {
     margin: 0;
-    color: #e6e9ff;
+    color: #eee8ff;
     font-size: 14px;
     font-weight: 750;
 }
 
 .town-heading > span {
-    color: #aab5d0;
+    color: #c4c2d3;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -235,7 +583,7 @@
 }
 
 .player-row:hover {
-    background: #15192a;
+    background: #1b1b2c;
 }
 
 .player-skin {
@@ -246,7 +594,7 @@
     overflow: hidden;
     place-items: center;
     background: #20253a;
-    border: 1px solid #3c4561;
+    border: 1px solid #4b4568;
     border-radius: 7px;
 }
 
@@ -258,7 +606,7 @@
 }
 
 .player-skin-fallback {
-    color: #d7d9ff;
+    color: #e2d5f7;
     font-size: 18px;
     font-weight: 750;
 }
@@ -266,7 +614,7 @@
 .player-name {
     overflow: hidden;
     flex: 1;
-    color: #c5ccdf;
+    color: #e1ddec;
     font-size: 13px;
     font-weight: 700;
     text-align: left;
@@ -281,7 +629,7 @@
 
 .player-row.is-offline .player-name,
 .player-row.is-offline .player-presence {
-    color: #ff8585;
+    color: #ff9292;
 }
 
 .player-presence {
@@ -305,13 +653,13 @@
 }
 
 .is-offline .player-status-dot {
-    box-shadow: 0 0 0 3px #ff85851c;
+    box-shadow: 0 0 0 3px #ff92921c;
 }
 
 .town-empty,
 .roster-empty {
     margin: 13px 0 0 !important;
-    color: #aab5d0 !important;
+    color: #c4c2d3 !important;
     font-size: 13px !important;
     line-height: 1.5 !important;
 }
@@ -323,7 +671,7 @@
     gap: 12px;
     margin-top: 15px;
     padding: 11px 12px;
-    color: #ffaaaa;
+    color: #ffc1c1;
     background: #351e2a;
     border: 1px solid #754050;
     border-radius: 8px;
@@ -363,25 +711,204 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 760px) {
     .community-section {
-        padding: 35px 14px;
+        padding: 20px 16px 36px;
+    }
+
+    .community-shortcuts {
+        gap: 10px;
+    }
+
+    .community-shortcut {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        min-height: 122px;
+        padding: 13px;
+    }
+
+    .shortcut-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .shortcut-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .featured-town-grid,
+    .featured-town-loading {
+        gap: 10px;
+    }
+
+    .featured-town-card {
+        gap: 7px;
+        padding: 12px 8px 12px 22px;
+    }
+
+    .town-emblem {
+        width: 34px;
+        height: 42px;
+    }
+
+    .town-emblem svg {
+        width: 34px;
+        height: 34px;
+    }
+
+    .town-online-count {
+        min-width: 35px;
+    }
+
+    .town-roster {
+        padding: 19px 16px;
+    }
+
+    .town-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .community-section {
+        padding: 16px 14px 30px;
     }
 
     .community-card {
-        padding: 30px 18px;
+        min-height: auto;
+        margin-bottom: 16px;
+        padding: 17px 15px 18px;
+    }
+
+    .community-icon {
+        width: 54px;
+        height: 54px;
+        margin-bottom: 10px;
+    }
+
+    .community-eyebrow {
+        gap: 8px;
+        font-size: 8px;
+        letter-spacing: 2.2px;
+    }
+
+    .community-eyebrow::before,
+    .community-eyebrow::after {
+        width: 34px;
+    }
+
+    .community-card h1 {
+        font-size: 27px;
+    }
+
+    .community-card > p {
+        max-width: 38ch;
+        margin-bottom: 14px;
+        font-size: 12px;
+    }
+
+    .community-actions {
+        width: 100%;
+        gap: 9px;
+    }
+
+    .community-button {
+        min-width: 0;
+        min-height: 42px;
+        flex: 1;
+        gap: 6px;
+        padding: 9px 7px;
+        font-size: 10px;
+    }
+
+    .community-button svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .button-arrow {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    .community-shortcuts {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 22px;
+    }
+
+    .community-shortcut {
+        flex-direction: row;
+        align-items: center;
+        min-height: 66px;
+        padding: 9px 13px;
+    }
+
+    .shortcut-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .community-section-heading {
+        gap: 9px;
+        margin-bottom: 13px;
+    }
+
+    .community-section-heading h2 {
+        font-size: 18px;
+    }
+
+    .community-section-heading > span {
+        width: 34px;
+    }
+
+    .featured-town-grid,
+    .featured-town-loading {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .featured-town-card {
+        min-height: 72px;
+        gap: 12px;
+        padding: 10px 13px 10px 27px;
+    }
+
+    .town-emblem {
+        width: 43px;
+        height: 48px;
+    }
+
+    .town-emblem svg {
+        width: 42px;
+        height: 42px;
+    }
+
+    .town-online-count {
+        min-width: 44px;
+    }
+
+    .featured-towns {
+        margin-bottom: 23px;
+    }
+
+    .town-roster {
+        padding: 16px 12px;
     }
 
     .roster-toolbar {
         align-items: center;
+        gap: 8px;
     }
 
     .roster-toolbar h3 {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .roster-toolbar p {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .roster-refresh {
@@ -404,19 +931,11 @@
         gap: 5px;
         font-size: 10px;
     }
-
-    .community-actions {
-        flex-direction: column;
-    }
-
-    .community-button {
-        width: 100%;
-        font-size: 12px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .roster-skeleton {
+    .roster-skeleton,
+    .featured-town-skeleton {
         animation: none;
     }
 }
