@@ -11,7 +11,7 @@ const ServerHeader = () => {
     const copiarIP = async () => {
         try {
             await navigator.clipboard.writeText(ip);
-            alert('Â¡IP copiada! ' + ip);
+            alert('¡IP copiada! ' + ip);
         } catch {
             window.prompt('Copia la IP del servidor:', ip);
         }
@@ -24,11 +24,11 @@ const ServerHeader = () => {
 
                 <div className="banner-content">
                     <div className="banner-item banner-players">
-                        <span className="banner-icon">ðŸŽ®</span>
+                        <span className="banner-icon">🎮</span>
 
                         <div>
                             <span className="banner-small">
-                                0 JUGADORES EN LÃNEA
+                                0 JUGADORES EN LÍNEA
                             </span>
                             <strong>pgsql-stained.tun.ply.gg</strong>
                         </div>
@@ -54,12 +54,12 @@ const ServerHeader = () => {
                     >
                         <div>
                             <span className="banner-small">
-                                Â¡HAZ CLIC PARA UNIRTE!
+                                ¡HAZ CLIC PARA UNIRTE!
                             </span>
                             <strong>DISCORD SERVER</strong>
                         </div>
 
-                        <span className="discord-icon">â—‰</span>
+                        <span className="discord-icon">◉</span>
                     </a>
                 </div>
             </header>
@@ -73,16 +73,16 @@ const ServerHeader = () => {
                         className="guia-modal"
                         role="dialog"
                         aria-modal="true"
-                        aria-label="CÃ³mo entrar a ZURILAND"
+                        aria-label="Cómo entrar a ZURILAND"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             type="button"
                             className="guia-cerrar"
                             onClick={() => setMostrarGuia(false)}
-                            aria-label="Cerrar guÃ­a"
+                            aria-label="Cerrar guía"
                         >
-                            Ã—
+                            ×
                         </button>
 
 

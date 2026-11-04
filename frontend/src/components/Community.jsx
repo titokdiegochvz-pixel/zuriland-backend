@@ -101,10 +101,10 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
     return (
         <section className="community-section">
             <div className="community-card">
-                <div className="community-icon">ðŸŒ</div>
+                <div className="community-icon">🌐</div>
 
                 <span className="community-eyebrow">
-                    COMPETICIÃ“N GLOBAL
+                    COMPETICIÓN GLOBAL
                 </span>
 
                 <h2>Comunidad</h2>
@@ -119,18 +119,18 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         className="community-button ranking-button"
                         onClick={onOpenRanking}
                     >
-                        <span>ðŸ†</span>
-                        Tabla de clasificaciÃ³n
-                        <span className="button-arrow">â†’</span>
+                        <span>🏆</span>
+                        Tabla de clasificación
+                        <span className="button-arrow">→</span>
                     </button>
 
                     <button
                         className="community-button rules-button"
                         onClick={onOpenRules}
                     >
-                        <span>ðŸ“œ</span>
+                        <span>📜</span>
                         Reglas
-                        <span className="button-arrow">â†’</span>
+                        <span className="button-arrow">→</span>
                     </button>
                 </div>
 

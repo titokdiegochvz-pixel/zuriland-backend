@@ -11,7 +11,7 @@ header {
   background: #161B26;
   padding: 20px;
   text-align: center;
-  border-bottom: 3px solid #8A2BE2; /* Morado NeÃ³n */
+  border-bottom: 3px solid #8A2BE2; /* Morado Neón */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -25,10 +25,10 @@ nav a {
 }
 
 nav a:hover {
-  color: #00D4FF; /* Azul ElÃ©ctrico */
+  color: #00D4FF; /* Azul Eléctrico */
 }
 
-/* Contenedores de SecciÃ³n */
+/* Contenedores de Sección */
 section {
   padding: 40px 20px;
   max-width: 800px;
@@ -131,5 +131,5 @@ input {
 }
 
 .form-options a {
-  color: #00D4FF; /* Azul ElÃ©ctrico */
+  color: #00D4FF; /* Azul Eléctrico */
 }

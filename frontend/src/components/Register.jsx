@@ -43,7 +43,7 @@ function Register() {
           <input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
-          <label htmlFor="password">ContraseÃ±a:</label>
+          <label htmlFor="password">Contraseña:</label>
           <div className="password-input">
             <input
               id="password"
@@ -59,7 +59,7 @@ function Register() {
               type="button"
               className="password-toggle"
               onClick={() => setMostrarPassword((mostrar) => !mostrar)}
-              aria-label={mostrarPassword ? 'Ocultar contraseÃ±a' : 'Mostrar contraseÃ±a'}
+              aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               aria-pressed={mostrarPassword}
             >
               {mostrarPassword ? 'Ocultar' : 'Mostrar'}

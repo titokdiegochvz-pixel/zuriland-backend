@@ -36,13 +36,13 @@ const Login = () => {
 
     return (
         <section className="content-section">
-            <h2>Iniciar sesiÃ³n</h2>
-            <p>Inicia sesiÃ³n para acceder a tu cuenta.</p>
+            <h2>Iniciar sesión</h2>
+            <p>Inicia sesión para acceder a tu cuenta.</p>
             <p>Inicia con el nombre de usuario o correo que registraste.</p>
 
             <form onSubmit={handleLogin} className="login-form">
                 <div>
-                    <label htmlFor="login-identificador">Usuario o correo electrÃ³nico</label>
+                    <label htmlFor="login-identificador">Usuario o correo electrónico</label>
                     <input
                         id="login-identificador"
                         type="text"
@@ -54,7 +54,7 @@ const Login = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="login-password">ContraseÃ±a</label>
+                    <label htmlFor="login-password">Contraseña</label>
                     <input
                         id="login-password"
                         type="password"
@@ -72,11 +72,11 @@ const Login = () => {
                         <input id="remember-login" type="checkbox" /> Recordarme
                     </label>
 
-                    <Link to="/register">Â¿Olvidaste tu contraseÃ±a?</Link>
+                    <Link to="/register">¿Olvidaste tu contraseña?</Link>
                 </div>
 
                 <button type="submit" className="btn-buy" disabled={iniciando}>
-                    {iniciando ? 'Iniciando sesiÃ³n...' : 'Iniciar sesiÃ³n'}
+                    {iniciando ? 'Iniciando sesión...' : 'Iniciar sesión'}
                 </button>
             </form>
         </section>

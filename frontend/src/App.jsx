@@ -17,7 +17,7 @@ function PagoExitoso() {
     return (
         <section className="content-section">
             <h2>Pago exitoso</h2>
-            <p>Tu compra se realizÃ³ correctamente.</p>
+            <p>Tu compra se realizó correctamente.</p>
         </section>
     );
 }

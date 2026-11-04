@@ -8,7 +8,7 @@ const Ranking = ({ onBack }) => {
     const [nations] = useState([
         {
             id: 1,
-            name: 'Imperio EspaÃ±ol',
+            name: 'Imperio Español',
             residents: 45,
             towns: 12,
             land: 350,
@@ -17,7 +17,7 @@ const Ranking = ({ onBack }) => {
         },
         {
             id: 2,
-            name: 'Reino de MÃ©xico',
+            name: 'Reino de México',
             residents: 38,
             towns: 10,
             land: 290,
@@ -26,7 +26,7 @@ const Ranking = ({ onBack }) => {
         },
         {
             id: 3,
-            name: 'RepÃºblica Francesa',
+            name: 'República Francesa',
             residents: 30,
             towns: 8,
             land: 220,
@@ -35,7 +35,7 @@ const Ranking = ({ onBack }) => {
         },
         {
             id: 4,
-            name: 'Imperio JaponÃ©s',
+            name: 'Imperio Japonés',
             residents: 22,
             towns: 6,
             land: 180,
@@ -44,7 +44,7 @@ const Ranking = ({ onBack }) => {
         },
         {
             id: 5,
-            name: 'Reino BritÃ¡nico',
+            name: 'Reino Británico',
             residents: 18,
             towns: 5,
             land: 140,
@@ -54,11 +54,11 @@ const Ranking = ({ onBack }) => {
     ]);
 
     const categories = {
-        residents: { label: 'Residentes', icon: 'ðŸ‘¥' },
-        towns: { label: 'Pueblos', icon: 'ðŸ˜ï¸' },
-        land: { label: 'Territorio', icon: 'ðŸ—ºï¸' },
-        money: { label: 'Dinero', icon: 'ðŸ’°' },
-        kills: { label: 'Matanzas', icon: 'âš”ï¸' },
+        residents: { label: 'Residentes', icon: '👥' },
+        towns: { label: 'Pueblos', icon: '🏘️' },
+        land: { label: 'Territorio', icon: '🗺️' },
+        money: { label: 'Dinero', icon: '💰' },
+        kills: { label: 'Matanzas', icon: '⚔️' },
     };
 
     const formatMoney = (value) =>
@@ -75,16 +75,16 @@ const Ranking = ({ onBack }) => {
         <section className="ranking-section">
             <div className="ranking-heading">
                 <button className="ranking-back" onClick={onBack}>
-                    â† Volver a comunidad
+                    ← Volver a comunidad
                 </button>
 
                 <span className="ranking-eyebrow">
-                    COMPETICIÃ“N GLOBAL
+                    COMPETICIÓN GLOBAL
                 </span>
 
-                <h2>Tabla de clasificaciÃ³n</h2>
+                <h2>Tabla de clasificación</h2>
 
-                <p>Compara las estadÃ­sticas de las naciones.</p>
+                <p>Compara las estadísticas de las naciones.</p>
             </div>
 
             <div className="ranking-tabs">
@@ -106,7 +106,7 @@ const Ranking = ({ onBack }) => {
                     <thead>
                         <tr>
                             <th>POS.</th>
-                            <th>NACIÃ“N</th>
+                            <th>NACIÓN</th>
                             <th>RESIDENTES</th>
                             <th>PUEBLOS</th>
                             <th>TERRITORIO</th>
@@ -120,11 +120,11 @@ const Ranking = ({ onBack }) => {
                             <tr key={nation.id}>
                                 <td className="rank-position">
                                     {index === 0
-                                        ? 'ðŸ¥‡'
+                                        ? '🥇'
                                         : index === 1
-                                        ? 'ðŸ¥ˆ'
+                                        ? '🥈'
                                         : index === 2
-                                        ? 'ðŸ¥‰'
+                                        ? '🥉'
                                         : index + 1}
                                 </td>
 
@@ -152,8 +152,8 @@ const Ranking = ({ onBack }) => {
             </div>
 
             <footer className="ranking-footer">
-                <span>ðŸŒ {nations.length} naciones</span>
-                <span>Datos de demostraciÃ³n</span>
+                <span>🌍 {nations.length} naciones</span>
+                <span>Datos de demostración</span>
             </footer>
         </section>
     );

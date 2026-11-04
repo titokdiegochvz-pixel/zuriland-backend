@@ -28,7 +28,7 @@ const Store = () => {
             if (data.url) {
                 window.location.href = data.url;
             } else {
-                alert(data.error || 'Error al crear la sesiÃ³n de pago.');
+                alert(data.error || 'Error al crear la sesión de pago.');
             }
 
         } catch (error) {
@@ -88,7 +88,7 @@ const Store = () => {
             .then(async (response) => {
                 const data = await response.json();
                 if (!response.ok || data.status !== 'COMPLETED') {
-                    throw new Error(data.message || 'PayPal no confirmÃ³ el pago.');
+                    throw new Error(data.message || 'PayPal no confirmó el pago.');
                 }
                 setPaypalMensaje(`Pago confirmado para ${data.title}.`);
                 setSearchParams({}, { replace: true });
@@ -109,7 +109,7 @@ const Store = () => {
         cosmeticos: [],
         comandos: {
             "Productos": [
-                { titulo: 'Pack Utilidad', precio: 49, desc: '/feed (10m), /heal (15m), /fix (uso Ãºnico), /enderchest' },
+                { titulo: 'Pack Utilidad', precio: 49, desc: '/feed (10m), /heal (15m), /fix (uso único), /enderchest' },
                 { titulo: 'Pack Maestro', precio: 149, desc: '/heal ilimitado, /feed ilimitado, /fix ilimitado, /nick, 10 slots /sethome' }
             ]
         }
@@ -121,7 +121,7 @@ const Store = () => {
 
             <div className="category-nav">
                 <button onClick={() => setCategoria('rangos')}>Rangos</button>
-                <button onClick={() => setCategoria('cosmeticos')}>CosmÃ©ticos</button>
+                <button onClick={() => setCategoria('cosmeticos')}>Cosméticos</button>
                 <button onClick={() => setCategoria('comandos')}>Comandos</button>
             </div>
 
@@ -140,7 +140,7 @@ const Store = () => {
                                         <p style={{ fontSize: '0.85rem' }}>{item.desc}</p>
                                         <p><strong>{item.precio} pesos mexicanos</strong></p>
                                         <button onClick={() => comprar(item.titulo, item.precio)} className="btn-buy">
-                                            ðŸ›’ Pagar con tarjeta
+                                            🛒 Pagar con tarjeta
                                         </button>
                                         <button onClick={() => pagarConPayPal(item.titulo)} className="btn-buy" disabled={paypalProcesando}>
                                             Pagar con PayPal
@@ -157,7 +157,7 @@ const Store = () => {
                                 <h3>{item.titulo}</h3>
                                 <p>{item.desc}</p>
                                 <button onClick={() => comprar(item.titulo, item.precio)} className="btn-buy">
-                                    ðŸ›’ Pagar con tarjeta - {item.precio} pesos mexicanos
+                                    🛒 Pagar con tarjeta - {item.precio} pesos mexicanos
                                 </button>
                                 <button onClick={() => pagarConPayPal(item.titulo)} className="btn-buy" disabled={paypalProcesando}>
                                     Pagar con PayPal
@@ -165,7 +165,7 @@ const Store = () => {
                             </div>
                         ))
                     ) : (
-                        <p>No hay productos disponibles en esta categorÃ­a.</p>
+                        <p>No hay productos disponibles en esta categoría.</p>
                     )
                 )}
             </div>

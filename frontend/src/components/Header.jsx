@@ -33,13 +33,13 @@ const Header = () => {
                                 Hola, {usuario.nombre}
                             </span>
                             <button type="button" className="register-button" onClick={cerrarSesion}>
-                                Cerrar sesiÃ³n
+                                Cerrar sesión
                             </button>
                         </>
                     ) : (
                         <>
                             <Link to="/login" className="account-link">
-                                <span>â™™</span> Iniciar sesiÃ³n
+                                <span>♙</span> Iniciar sesión
                             </Link>
 
                             <Link to="/register" className="register-button">
@@ -49,7 +49,7 @@ const Header = () => {
                     )}
 
                     <Link to="/store" className="cart-button" title="Ir a la tienda">
-                        ðŸ›’
+                        🛒
                         <span className="cart-count">0</span>
                     </Link>
                 </div>
