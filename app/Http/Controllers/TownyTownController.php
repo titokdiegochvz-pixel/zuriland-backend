@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class TownyTownController extends Controller
 {
     private const RECENT_KILLS_LIMIT = 18;
+    private const KILL_LEADERBOARD_LIMIT = 10;
 
     public function index()
     {
@@ -22,7 +23,7 @@ class TownyTownController extends Controller
             $key = strtolower($town['name']);
             $townsByName[$key] = [
                 'name' => $town['name'],
-                'residents' => $town['residents'],
+                'players' => $town['players'] ?? $town['residents'] ?? [],
                 'kills' => [],
             ];
         }
@@ -39,13 +40,9 @@ class TownyTownController extends Controller
             if (! isset($townsByName[$key])) {
                 $townsByName[$key] = [
                     'name' => $townName,
-                    'residents' => [],
+                    'players' => [],
                     'kills' => [],
                 ];
-            }
-
-            if (! in_array($kill->killer_name, $townsByName[$key]['residents'], true)) {
-                $townsByName[$key]['residents'][] = $kill->killer_name;
             }
 
             $townsByName[$key]['kills'][] = [
@@ -54,6 +51,18 @@ class TownyTownController extends Controller
                 'occurred_at' => $kill->occurred_at,
             ];
         }
+
+        $killLeaderboard = DB::table('towny_kill_events')
+            ->select('killer_name', DB::raw('COUNT(*) as kills'))
+            ->groupBy('killer_name')
+            ->orderByDesc('kills')
+            ->orderBy('killer_name')
+            ->limit(self::KILL_LEADERBOARD_LIMIT)
+            ->get()
+            ->map(fn ($player) => [
+                'player' => $player->killer_name,
+                'kills' => (int) $player->kills,
+            ]);
 
         $towns = array_values($townsByName);
         usort($towns, fn (array $first, array $second) => strcasecmp($first['name'], $second['name']));
@@ -66,6 +75,7 @@ class TownyTownController extends Controller
 
         return response()->json([
             'towns' => $towns,
+            'kill_leaderboard' => $killLeaderboard,
             'updated_at' => $updatedAt,
         ]);
     }
@@ -91,14 +101,21 @@ class TownyTownController extends Controller
         $validated = $request->validate([
             'towns' => ['required', 'array', 'max:1000'],
             'towns.*.name' => ['required', 'string', 'max:100'],
-            'towns.*.residents' => ['required', 'array', 'max:10000'],
+            'towns.*.players' => ['sometimes', 'required', 'array', 'max:10000'],
+            'towns.*.players.*' => ['required', 'string', 'max:16'],
+            'towns.*.residents' => ['sometimes', 'required', 'array', 'max:10000'],
             'towns.*.residents.*' => ['required', 'string', 'max:16'],
         ]);
+
+        $towns = array_map(fn (array $town) => [
+            'name' => $town['name'],
+            'players' => $town['players'] ?? $town['residents'] ?? [],
+        ], $validated['towns']);
 
         $now = now();
         $exists = DB::table('towny_town_snapshots')->where('id', 1)->exists();
         $values = [
-            'data' => json_encode($validated['towns'], JSON_THROW_ON_ERROR),
+            'data' => json_encode($towns, JSON_THROW_ON_ERROR),
             'updated_at' => $now,
         ];
 

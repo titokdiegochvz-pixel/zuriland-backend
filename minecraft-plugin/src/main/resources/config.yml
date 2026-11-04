@@ -1,4 +1,5 @@
 api-url: "https://zuriland-api-ajeu.onrender.com"
 sync-token: ""
 sync-interval-seconds: 300
+town-roster-sync-interval-seconds: 30
 player-sync-interval-seconds: 5

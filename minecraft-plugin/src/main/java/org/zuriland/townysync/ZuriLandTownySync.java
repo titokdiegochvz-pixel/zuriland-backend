@@ -6,6 +6,7 @@ import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -23,7 +24,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -35,7 +39,9 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
     private URI townsEndpoint;
     private String syncToken;
     private int syncIntervalSeconds;
+    private int townRosterSyncIntervalSeconds;
     private int playerSyncIntervalSeconds;
+    private BukkitTask pendingTownRosterSync;
 
     @Override
     public void onEnable() {
@@ -44,6 +50,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         String apiUrl = getConfig().getString("api-url", "").trim();
         syncToken = getConfig().getString("sync-token", "").trim();
         syncIntervalSeconds = getConfig().getInt("sync-interval-seconds", 300);
+        townRosterSyncIntervalSeconds = getConfig().getInt("town-roster-sync-interval-seconds", 30);
         playerSyncIntervalSeconds = getConfig().getInt("player-sync-interval-seconds", 5);
 
         if (apiUrl.isEmpty() || syncToken.isEmpty()) {
@@ -60,6 +67,12 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
 
         if (playerSyncIntervalSeconds < 5) {
             getLogger().severe("player-sync-interval-seconds must be at least 5.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (townRosterSyncIntervalSeconds < 10) {
+            getLogger().severe("town-roster-sync-interval-seconds must be at least 10.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -96,7 +109,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             this,
             this::syncTownSnapshot,
             20L,
-            intervalTicks
+            townRosterSyncIntervalSeconds * 20L
         );
         Bukkit.getScheduler().runTaskTimer(
             this,
@@ -106,18 +119,31 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
         );
         getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("Towny rankings will sync to ZuriLand every " + syncIntervalSeconds + " seconds.");
-        getLogger().info("Town and resident names will sync to ZuriLand every " + syncIntervalSeconds + " seconds.");
+        getLogger().info("Online Towny players will sync to ZuriLand every " + townRosterSyncIntervalSeconds + " seconds.");
         getLogger().info("Minecraft player counts will sync to ZuriLand every " + playerSyncIntervalSeconds + " seconds.");
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         syncPlayerCountNextTick();
+        scheduleTownSnapshotSync();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         syncPlayerCountNextTick();
+        scheduleTownSnapshotSync();
+    }
+
+    private void scheduleTownSnapshotSync() {
+        if (pendingTownRosterSync != null) {
+            return;
+        }
+
+        pendingTownRosterSync = Bukkit.getScheduler().runTaskLater(this, () -> {
+            pendingTownRosterSync = null;
+            syncTownSnapshot();
+        }, 40L);
     }
 
     @EventHandler
@@ -232,13 +258,20 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
 
     private void syncTownSnapshot() {
         List<TownSnapshot> towns = new ArrayList<>();
+        Map<UUID, String> onlinePlayers = new HashMap<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            onlinePlayers.put(player.getUniqueId(), player.getName());
+        }
+
         for (Town town : TownyUniverse.getInstance().getTowns()) {
-            List<String> residents = town.getResidents().stream()
+            List<String> players = town.getResidents().stream()
                 .filter(resident -> !resident.isNPC())
-                .map(Resident::getName)
+                .filter(Resident::hasUUID)
+                .map(resident -> onlinePlayers.get(resident.getUUID()))
+                .filter(Objects::nonNull)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList();
-            towns.add(new TownSnapshot(town.getName(), residents));
+            towns.add(new TownSnapshot(town.getName(), players));
         }
 
         towns.sort(Comparator.comparing(TownSnapshot::name, String.CASE_INSENSITIVE_ORDER));
@@ -251,13 +284,13 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             TownSnapshot town = towns.get(townIndex);
             json.append("{\"name\":\"")
                 .append(escapeJson(town.name()))
-                .append("\",\"residents\":[");
-            for (int residentIndex = 0; residentIndex < town.residents().size(); residentIndex++) {
-                if (residentIndex > 0) {
+                .append("\",\"players\":[");
+            for (int playerIndex = 0; playerIndex < town.players().size(); playerIndex++) {
+                if (playerIndex > 0) {
                     json.append(',');
                 }
                 json.append('"')
-                    .append(escapeJson(town.residents().get(residentIndex)))
+                    .append(escapeJson(town.players().get(playerIndex)))
                     .append('"');
             }
             json.append("]}");
@@ -388,7 +421,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
     private record KillEvent(String eventId, String killerName, String killerTown, String victimName, String occurredAt) {
     }
 
-    private record TownSnapshot(String name, List<String> residents) {
+    private record TownSnapshot(String name, List<String> players) {
     }
 
     private record Snapshot(String payload, int nationCount) {

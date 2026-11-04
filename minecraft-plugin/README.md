@@ -1,6 +1,6 @@
 # ZuriLand Towny Sync
 
-This Paper plugin reads nation, town, resident, and claimed-plot counts from Towny 0.103.2.0, adds each nation's total player kills, and sends snapshots to the ZuriLand API over HTTPS. It also sends the names of all Towny towns and residents every five minutes. Each player-versus-player kill is recorded with the killer's name and town, the eliminated player's name, and the event time. The website groups residents by town and shows the latest 18 kills. The plugin also sends the online player count every five seconds and immediately after a player joins or leaves. The Minecraft server makes the outbound connection; no inbound ports or direct website access to the game server/database are required.
+This Paper plugin reads nation, town, resident, and claimed-plot counts from Towny 0.103.2.0, adds each nation's total player kills, and sends snapshots to the ZuriLand API over HTTPS. It publishes only currently online Towny players by town every 30 seconds and immediately after a player joins or leaves. Each player-versus-player kill is recorded with the killer's name and town, the eliminated player's name, and the event time; the website ranks the top 10 killers recorded since event tracking was enabled. The plugin also sends the online player count every five seconds and immediately after a player joins or leaves. The Minecraft server makes the outbound connection; no inbound ports or direct website access to the game server/database are required.
 
 ## Build
 
@@ -18,7 +18,7 @@ The plugin JAR is created at `target/zuriland-towny-sync-1.0.0.jar`.
 2. Save the environment change and wait for the API deployment to finish.
 3. Copy the plugin JAR into the Minecraft server's `plugins` directory. Towny 0.103.2.0 must already be installed.
 4. Start the server once, then edit `plugins/ZuriLandTownySync/config.yml` and set `sync-token` to the same token. Keep `api-url` on the HTTPS Render API URL.
-5. Restart the server. It sends the first player count and Towny data shortly after startup, then player counts every five seconds and Towny snapshots every five minutes. Each player-versus-player kill is sent to the API when it happens.
+5. Restart the server. It sends the first player count and online Towny roster shortly after startup, then player counts every five seconds and online rosters every 30 seconds and after joins/leaves. Each player-versus-player kill is sent to the API when it happens.
 6. Open `/api/towny/kills` on the API to confirm the public town roster and recent kill events.
 
-The public website only exposes the published town roster and latest 18 kill events. All ingest endpoints require the bearer token. Kill event IDs prevent duplicate rows if the same event is submitted more than once.
+The public website exposes each town's current online roster, the latest 18 kill events, and the top 10 killers based on recorded PvP events. Historical kills from before the plugin was installed are not reconstructed. All ingest endpoints require the bearer token. Kill event IDs prevent duplicate rows if the same event is submitted more than once.
