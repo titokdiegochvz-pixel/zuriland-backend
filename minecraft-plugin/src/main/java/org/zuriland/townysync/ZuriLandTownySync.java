@@ -170,6 +170,7 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
             this,
             () -> sendKillEvent(killEvent)
         );
+        scheduleTownSnapshotSync();
     }
 
     private void syncPlayerCountNextTick() {
@@ -258,18 +259,21 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
 
     private void syncTownSnapshot() {
         List<TownSnapshot> towns = new ArrayList<>();
-        Map<UUID, String> onlinePlayers = new HashMap<>();
+        Map<UUID, PlayerSnapshot> onlinePlayers = new HashMap<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            onlinePlayers.put(player.getUniqueId(), player.getName());
+            onlinePlayers.put(
+                player.getUniqueId(),
+                new PlayerSnapshot(player.getName(), player.getStatistic(Statistic.PLAYER_KILLS))
+            );
         }
 
         for (Town town : TownyUniverse.getInstance().getTowns()) {
-            List<String> players = town.getResidents().stream()
+            List<PlayerSnapshot> players = town.getResidents().stream()
                 .filter(resident -> !resident.isNPC())
                 .filter(Resident::hasUUID)
                 .map(resident -> onlinePlayers.get(resident.getUUID()))
                 .filter(Objects::nonNull)
-                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .sorted(Comparator.comparing(PlayerSnapshot::name, String.CASE_INSENSITIVE_ORDER))
                 .toList();
             towns.add(new TownSnapshot(town.getName(), players));
         }
@@ -289,9 +293,12 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
                 if (playerIndex > 0) {
                     json.append(',');
                 }
-                json.append('"')
-                    .append(escapeJson(town.players().get(playerIndex)))
-                    .append('"');
+                PlayerSnapshot player = town.players().get(playerIndex);
+                json.append("{\"name\":\"")
+                    .append(escapeJson(player.name()))
+                    .append("\",\"kills\":")
+                    .append(player.kills())
+                    .append('}');
             }
             json.append("]}");
         }
@@ -421,7 +428,10 @@ public final class ZuriLandTownySync extends JavaPlugin implements Listener {
     private record KillEvent(String eventId, String killerName, String killerTown, String victimName, String occurredAt) {
     }
 
-    private record TownSnapshot(String name, List<String> players) {
+    private record PlayerSnapshot(String name, int kills) {
+    }
+
+    private record TownSnapshot(String name, List<PlayerSnapshot> players) {
     }
 
     private record Snapshot(String payload, int nationCount) {

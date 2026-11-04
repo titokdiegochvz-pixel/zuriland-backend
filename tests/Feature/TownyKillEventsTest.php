@@ -16,7 +16,6 @@ class TownyKillEventsTest extends TestCase
             ->assertOk()
             ->assertExactJson([
                 'towns' => [],
-                'kill_leaderboard' => [],
                 'updated_at' => null,
             ]);
     }
@@ -28,11 +27,19 @@ class TownyKillEventsTest extends TestCase
             'towns' => [
                 [
                     'name' => 'Thalassia',
-                    'players' => ['Yisuautu', 'Iatomicmk'],
+                    'players' => [
+                        ['name' => 'Yisuautu', 'kills' => 14],
+                        ['name' => 'Iatomicmk', 'kills' => 7],
+                    ],
                 ],
                 [
                     'name' => 'Atlantis',
-                    'players' => ['Amaro', 'Zurixgod', 'Yisu', 'Iatomicmk'],
+                    'players' => [
+                        ['name' => 'Amaro', 'kills' => 42],
+                        ['name' => 'Zurixgod', 'kills' => 5],
+                        ['name' => 'Yisu', 'kills' => 2],
+                        ['name' => 'Iatomicmk', 'kills' => 7],
+                    ],
                 ],
             ],
         ];
@@ -45,10 +52,33 @@ class TownyKillEventsTest extends TestCase
         $this->getJson('/api/towny/kills')
             ->assertOk()
             ->assertJsonPath('towns.0.name', 'Atlantis')
-            ->assertJsonPath('towns.0.players.0', 'Amaro')
-            ->assertJsonPath('towns.0.players.3', 'Iatomicmk')
+            ->assertJsonPath('towns.0.players.0.name', 'Amaro')
+            ->assertJsonPath('towns.0.players.0.kills', 42)
+            ->assertJsonPath('towns.0.players.3.name', 'Iatomicmk')
+            ->assertJsonPath('towns.0.players.3.kills', 7)
             ->assertJsonPath('towns.1.name', 'Thalassia')
-            ->assertJsonPath('towns.1.players.0', 'Yisuautu');
+            ->assertJsonPath('towns.1.players.0.name', 'Yisuautu')
+            ->assertJsonPath('towns.1.players.0.kills', 14);
+    }
+
+    public function test_legacy_town_residents_are_published_with_zero_kills_until_next_online_sync(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    ['name' => 'Thalassia', 'residents' => ['Yisuautu', 'Iatomicmk']],
+                ],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonPath('towns.0.players.0.name', 'Yisuautu')
+            ->assertJsonPath('towns.0.players.0.kills', 0)
+            ->assertJsonPath('towns.0.players.1.name', 'Iatomicmk')
+            ->assertJsonPath('towns.0.players.1.kills', 0);
     }
 
     public function test_town_snapshot_requires_the_sync_token(): void
@@ -102,9 +132,7 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonPath('towns.0.name', 'Atlantis')
             ->assertJsonPath('towns.0.players', [])
             ->assertJsonPath('towns.0.kills.0.killer_name', 'Alex')
-            ->assertJsonPath('towns.0.kills.0.victim_name', 'Steve')
-            ->assertJsonPath('kill_leaderboard.0.player', 'Alex')
-            ->assertJsonPath('kill_leaderboard.0.kills', 1);
+            ->assertJsonPath('towns.0.kills.0.victim_name', 'Steve');
     }
 
     public function test_repeated_kill_event_id_does_not_create_duplicate_rows(): void
@@ -143,31 +171,6 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonCount(18, 'towns.0.kills')
             ->assertJsonPath('towns.0.kills.0.killer_name', 'Killer20')
             ->assertJsonPath('towns.0.kills.17.killer_name', 'Killer3');
-    }
-
-    public function test_public_kill_leaderboard_returns_the_top_ten_players_by_recorded_kills(): void
-    {
-        foreach (range(1, 12) as $playerNumber) {
-            foreach (range(1, $playerNumber) as $killNumber) {
-                DB::table('towny_kill_events')->insert([
-                    'event_id' => fake()->uuid(),
-                    'killer_name' => 'Player'.$playerNumber,
-                    'killer_town' => 'Atlantis',
-                    'victim_name' => 'Victim'.$playerNumber.'_'.$killNumber,
-                    'occurred_at' => now()->addSeconds($killNumber),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
-
-        $this->getJson('/api/towny/kills')
-            ->assertOk()
-            ->assertJsonCount(10, 'kill_leaderboard')
-            ->assertJsonPath('kill_leaderboard.0.player', 'Player12')
-            ->assertJsonPath('kill_leaderboard.0.kills', 12)
-            ->assertJsonPath('kill_leaderboard.9.player', 'Player3')
-            ->assertJsonPath('kill_leaderboard.9.kills', 3);
     }
 
     public function test_kill_event_rejects_same_killer_and_victim(): void
