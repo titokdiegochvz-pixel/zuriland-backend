@@ -7,6 +7,8 @@
 
     RewriteEngine On
 
+    RewriteRule ^$ site/index.html [END]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
