@@ -5,8 +5,8 @@ import { DiscordIcon, GamepadIcon } from './UiIcons';
 import './ServerHeader.css';
 
 const ServerHeader = () => {
-    const [mostrarGuia, setMostrarGuia] = useState(false);
     const [estadoServidor, setEstadoServidor] = useState({ status: 'loading', players: 0 });
+    const [ipCopiada, setIpCopiada] = useState(false);
 
     const ip = 'pgsql-stained.tun.ply.gg';
 
@@ -59,7 +59,8 @@ const ServerHeader = () => {
     const copiarIP = async () => {
         try {
             await navigator.clipboard.writeText(ip);
-            alert('¡IP copiada! ' + ip);
+            setIpCopiada(true);
+            window.setTimeout(() => setIpCopiada(false), 2000);
         } catch {
             window.prompt('Copia la IP del servidor:', ip);
         }
@@ -94,9 +95,9 @@ const ServerHeader = () => {
                         <button
                             type="button"
                             className="btn-play"
-                            onClick={() => setMostrarGuia(true)}
+                            onClick={copiarIP}
                         >
-                            Ver guía visual
+                            {ipCopiada ? '¡IP copiada!' : 'Jugar ahora'}
                         </button>
                     </div>
 
@@ -117,56 +118,6 @@ const ServerHeader = () => {
                     </a>
                 </div>
             </header>
-
-            {mostrarGuia && (
-                <div
-                    className="guia-overlay"
-                    onClick={() => setMostrarGuia(false)}
-                >
-                    <div
-                        className="guia-modal"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-label="Cómo entrar a ZURILAND"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            type="button"
-                            className="guia-cerrar"
-                            onClick={() => setMostrarGuia(false)}
-                            aria-label="Cerrar guía"
-                        >
-                            ×
-                        </button>
-
-
-                  <img
-                   src={`${API_URL}/images/pgsql-stained.tun.ply.gg.jpg`}
-                   alt="Instrucciones para entrar al servidor ZURILAND"
-                   className="guia-imagen"
-                   width={2152}
-                   height={731}
-                   loading="lazy"
-                  />
-
-
-                        <p
-                            className="guia-error"
-                            style={{ display: 'none' }}
-                        >
-
-                        </p>
-
-                        <button
-                            type="button"
-                            className="guia-copiar"
-                            onClick={copiarIP}
-                        >
-                            Copiar IP del servidor
-                        </button>
-                    </div>
-                </div>
-            )}
         </>
     );
 };
