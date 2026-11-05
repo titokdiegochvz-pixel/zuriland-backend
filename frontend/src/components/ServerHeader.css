@@ -94,20 +94,12 @@
     min-width: 0;
 }
 
-.logo-z {
+.brand-logo {
+    display: block;
     width: 90px;
     height: 78px;
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(145deg, #8bbce5, #f0f4fa);
-    color: #fff;
-    font-size: 67px;
-    font-weight: 300;
-    font-family: Georgia, serif;
-    text-shadow: 2px 3px 4px #777;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    object-fit: contain;
 }
 
 .btn-play {
@@ -250,10 +242,9 @@
         overflow-wrap: anywhere;
     }
 
-    .logo-z {
+    .brand-logo {
         width: 65px;
         height: 58px;
-        font-size: 49px;
     }
 
     .btn-play {

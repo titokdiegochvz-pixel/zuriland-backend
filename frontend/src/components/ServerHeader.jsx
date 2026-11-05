@@ -89,7 +89,7 @@ const ServerHeader = () => {
                     </div>
 
                     <div className="banner-center">
-                        <div className="logo-z">Z</div>
+                        <img className="brand-logo" src="/site/logo512.png" alt="Logo de ZuriLand" />
 
                         <button
                             type="button"
