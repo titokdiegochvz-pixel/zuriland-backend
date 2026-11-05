@@ -99,7 +99,7 @@
     justify-content: center;
     align-items: center;
     gap: 11px;
-    min-width: 190px;
+    min-width: 230px;
     margin-top: 20px;
     padding: 13px 22px;
     border: 1px solid rgba(190, 132, 255, 0.65);
@@ -125,10 +125,11 @@
 
 .server-connect-panel {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: 20px;
-    width: min(890px, calc(100% - 40px));
+    gap: 22px 28px;
+    width: min(960px, calc(100% - 40px));
     max-width: none;
     min-height: 90px;
     box-sizing: border-box;
@@ -146,7 +147,6 @@
     display: flex;
     align-items: center;
     gap: 18px;
-    flex: 1;
     min-width: 0;
 }
 
@@ -179,34 +179,47 @@
 }
 
 .server-address {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto;
     align-items: center;
-    gap: 7px;
+    gap: 7px 8px;
+}
+
+.server-address-label {
+    grid-column: 1 / -1;
+    color: #d3c4eb;
+    font-size: 12px;
+    font-weight: 650;
 }
 
 .server-address code {
     min-width: 0;
-    padding: 11px 13px;
+    padding: 11px 12px;
     border: 1px solid #3c3769;
     border-radius: 8px;
     color: #e8e4ff;
     background: rgba(11, 13, 30, 0.62);
-    font-family: inherit;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: 13px;
     font-weight: 650;
     white-space: nowrap;
 }
 
 .server-address button {
-    display: grid;
-    width: 40px;
-    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
     flex: 0 0 auto;
-    place-items: center;
+    padding: 0 13px;
     border: 1px solid #6542a1;
     border-radius: 8px;
     color: #e9d8ff;
     background: #17172d;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     transition: background 160ms ease-out, border-color 160ms ease-out;
 }
@@ -217,8 +230,8 @@
 }
 
 .server-address button svg {
-    width: 19px;
-    height: 19px;
+    width: 17px;
+    height: 17px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
@@ -226,22 +239,49 @@
     stroke-width: 1.8;
 }
 
-.server-edition {
-    padding: 7px 12px;
-    border: 1px solid #477957;
-    border-radius: 999px;
-    color: #b9f4c8;
-    background: rgba(37, 106, 57, 0.16);
+.server-connect-steps {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 22px 0 0 22px;
+    border-top: 1px solid #45365f;
+    text-align: left;
+}
+
+.server-connect-steps li {
+    padding-right: 12px;
+    color: #f3edff;
+}
+
+.server-connect-steps li::marker {
+    color: #c28aff;
+    font-weight: 800;
+}
+
+.server-connect-steps strong,
+.server-connect-steps span {
+    display: block;
+}
+
+.server-connect-steps strong {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.server-connect-steps span {
+    color: #d0c8df;
     font-size: 12px;
-    font-weight: 700;
+    line-height: 1.55;
 }
 
 .server-copy-message {
-    position: absolute;
-    right: 24px;
-    bottom: -27px;
-    color: #b9f4c8;
+    grid-column: 1 / -1;
+    margin-top: -12px;
+    color: #c2f0ce;
     font-size: 12px;
+    text-align: right;
 }
 
 .home-feature-links {
@@ -412,14 +452,13 @@
     }
 
     .server-connect-panel {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 15px 10px;
-        padding: 17px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+        padding: 20px;
     }
 
     .server-connect-intro {
-        grid-column: 1 / -1;
+        grid-column: auto;
     }
 
     .server-connect-intro > svg {
@@ -436,13 +475,37 @@
     }
 
     .server-address {
+        grid-template-columns: minmax(0, 1fr) auto;
         min-width: 0;
     }
 
+    .server-address-label {
+        grid-column: 1 / -1;
+    }
+
     .server-address code {
+        overflow-wrap: anywhere;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .server-connect-steps {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding-top: 18px;
+    }
+
+    .server-connect-steps li {
+        padding-right: 0;
+    }
+
+    .server-copy-message {
+        grid-column: auto;
+        margin-top: -10px;
         overflow: hidden;
-        font-size: clamp(10px, 3vw, 13px);
-        text-overflow: ellipsis;
+        font-size: 12px;
+        text-align: left;
     }
 
     .home-feature-links {
@@ -480,13 +543,15 @@
     }
 
     .server-connect-panel {
-        grid-template-columns: minmax(0, 1fr) auto;
-        padding: 14px;
+        padding: 16px;
     }
 
-    .server-edition {
-        padding: 7px 9px;
-        font-size: 10px;
+    .server-address {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .server-address button {
+        width: 100%;
     }
 
     .home-footer {

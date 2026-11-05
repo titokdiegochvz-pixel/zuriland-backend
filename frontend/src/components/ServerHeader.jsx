@@ -29,7 +29,7 @@ const ServerHeader = () => {
 
                         <div>
                             <span className="banner-small">
-                                0 JUGADORES EN LÍNEA
+                                DIRECCIÓN DEL SERVIDOR
                             </span>
                             <strong>pgsql-stained.tun.ply.gg</strong>
                         </div>
@@ -43,7 +43,7 @@ const ServerHeader = () => {
                             className="btn-play"
                             onClick={() => setMostrarGuia(true)}
                         >
-                            Juega ahora
+                            Ver guía visual
                         </button>
                     </div>
 

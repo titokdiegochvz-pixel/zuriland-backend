@@ -41,26 +41,27 @@ const Home = () => {
                     <SparkIcon />
                     <span />
                 </div>
-                <p>Explora, construye y forma parte de una gran comunidad Survival.</p>
+                <p>Entra a jugar en pocos pasos. Copia la IP y agrégala en Minecraft Java.</p>
                 <a className="home-play-button" href="#server-connect">
                     <PlayIcon />
-                    Juega ahora
+                    Cómo entrar al servidor
                 </a>
             </section>
 
             <section
                 className="server-connect-panel"
                 id="server-connect"
-                aria-label="Conéctate al servidor"
+                aria-labelledby="server-connect-title"
             >
                 <div className="server-connect-intro">
                     <ServerIcon />
                     <div>
-                        <h2>Conéctate al servidor</h2>
+                        <h2 id="server-connect-title">Conéctate al servidor</h2>
                         <p>Minecraft Java Edition <span>·</span> Survival</p>
                     </div>
                 </div>
                 <div className="server-address">
+                    <span className="server-address-label">Dirección del servidor</span>
                     <code>{SERVER_IP}</code>
                     <button
                         type="button"
@@ -68,9 +69,25 @@ const Home = () => {
                         aria-label="Copiar IP del servidor"
                     >
                         <CopyIcon />
+                        Copiar IP
                     </button>
                 </div>
-                <span className="server-edition">Java</span>
+
+                <ol className="server-connect-steps">
+                    <li>
+                        <strong>Abre Minecraft Java</strong>
+                        <span>Inicia Minecraft: Java Edition.</span>
+                    </li>
+                    <li>
+                        <strong>Entra a Multijugador</strong>
+                        <span>En el menú principal, selecciona “Multijugador”.</span>
+                    </li>
+                    <li>
+                        <strong>Agrega ZuriLand</strong>
+                        <span>Pega la IP, guarda el servidor y selecciónalo para entrar.</span>
+                    </li>
+                </ol>
+
                 {copyMessage && (
                     <span className="server-copy-message" role="status">
                         {copyMessage}
