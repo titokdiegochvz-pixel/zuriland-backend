@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -15,6 +16,29 @@ class TownyKillEventsTest extends TestCase
         $this->getJson('/api/towny/kills')
             ->assertOk()
             ->assertExactJson([
+                'towns' => [],
+                'players' => [],
+                'updated_at' => null,
+            ]);
+    }
+
+    public function test_public_city_roster_returns_a_clear_unavailable_response_when_database_is_unreachable(): void
+    {
+        DB::shouldReceive('table')
+            ->once()
+            ->with('towny_town_snapshots')
+            ->andThrow(new QueryException(
+                'pgsql',
+                'select * from towny_town_snapshots where id = ?',
+                [1],
+                new \PDOException('Connection refused')
+            ));
+
+        $this->getJson('/api/towny/kills')
+            ->assertServiceUnavailable()
+            ->assertExactJson([
+                'available' => false,
+                'message' => 'Los datos de Towny no están disponibles. Revisa la conexión y las migraciones de la base de datos.',
                 'towns' => [],
                 'players' => [],
                 'updated_at' => null,

@@ -65,11 +65,11 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                     signal: controller.signal,
                     headers: { Accept: 'application/json' },
                 });
+                const data = await response.json();
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(data.message || `HTTP ${response.status}`);
                 }
 
-                const data = await response.json();
                 if (!Array.isArray(data.towns)) {
                     throw new Error('Invalid Towny roster response');
                 }
@@ -81,7 +81,7 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                 }
             } catch (requestError) {
                 if (isMounted && requestError.name !== 'AbortError') {
-                    setError('No se pudo cargar la lista. Revisa tu conexión e inténtalo de nuevo.');
+                    setError(requestError.message || 'No se pudo cargar la lista. Revisa tu conexión e inténtalo de nuevo.');
                 }
             } finally {
                 isRequestInFlight = false;

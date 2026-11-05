@@ -41,11 +41,11 @@ const Ranking = () => {
                     signal: controller.signal,
                     headers: { Accept: 'application/json' },
                 });
+                const data = await response.json();
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(data.message || `HTTP ${response.status}`);
                 }
 
-                const data = await response.json();
                 if (!Array.isArray(data.towns)) {
                     throw new Error('Invalid Towny ranking response');
                 }
@@ -84,7 +84,7 @@ const Ranking = () => {
                 setError('');
             } catch (requestError) {
                 if (requestError.name !== 'AbortError') {
-                    setError('No se pudo cargar la clasificación. Revisa tu conexión e inténtalo de nuevo.');
+                    setError(requestError.message || 'No se pudo cargar la clasificación. Revisa tu conexión e inténtalo de nuevo.');
                 }
             } finally {
                 if (!controller.signal.aborted) {

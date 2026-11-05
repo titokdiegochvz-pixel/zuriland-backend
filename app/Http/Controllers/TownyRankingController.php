@@ -2,21 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TownyRankingController extends Controller
 {
     public function show()
     {
-        $snapshot = DB::table('towny_ranking_snapshots')->where('id', 1)->first();
+        try {
+            $snapshot = DB::table('towny_ranking_snapshots')->where('id', 1)->first();
 
-        return response()->json([
-            'nations' => $snapshot
-                ? json_decode($snapshot->data, true, 512, JSON_THROW_ON_ERROR)
-                : [],
-            'updated_at' => $snapshot?->updated_at,
-        ]);
+            return response()->json([
+                'nations' => $snapshot
+                    ? json_decode($snapshot->data, true, 512, JSON_THROW_ON_ERROR)
+                    : [],
+                'updated_at' => $snapshot?->updated_at,
+            ]);
+        } catch (QueryException $exception) {
+            Log::warning('Unable to load the Towny ranking from the database.', [
+                'sql_state' => $exception->getCode(),
+            ]);
+
+            return response()->json([
+                'available' => false,
+                'message' => 'La clasificación de Towny no está disponible. Revisa la conexión y las migraciones de la base de datos.',
+                'nations' => [],
+                'updated_at' => null,
+            ], 503);
+        }
     }
 
     public function store(Request $request)

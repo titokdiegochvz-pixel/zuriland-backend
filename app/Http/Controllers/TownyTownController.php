@@ -2,15 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TownyTownController extends Controller
 {
     private const RECENT_KILLS_LIMIT = 18;
 
     public function index()
+    {
+        try {
+            return $this->townySnapshot();
+        } catch (QueryException $exception) {
+            Log::warning('Unable to load the Towny roster from the database.', [
+                'sql_state' => $exception->getCode(),
+            ]);
+
+            return response()->json([
+                'available' => false,
+                'message' => 'Los datos de Towny no están disponibles. Revisa la conexión y las migraciones de la base de datos.',
+                'towns' => [],
+                'players' => [],
+                'updated_at' => null,
+            ], 503);
+        }
+    }
+
+    private function townySnapshot()
     {
         $snapshot = DB::table('towny_town_snapshots')->where('id', 1)->first();
         $snapshotData = $snapshot
