@@ -116,7 +116,7 @@ secrets out of the public repository. Configure the frontend host to serve
 
 Deploy `render.yaml` as a Blueprint in Render. The Dockerfile builds the React
 frontend and serves it with the Laravel API. The service uses PostgreSQL;
-create a free database on Neon and set its connection string as `DB_URL`.
+create a database on Neon and set its connection string as `DB_URL`.
 Render's free web service can sleep while idle, and Neon free databases scale
 to zero.
 
@@ -125,6 +125,12 @@ After deployment, set `APP_URL` to the API's public URL. Set
 `FRONTEND_URL` and `CORS_ALLOWED_ORIGINS` if the frontend uses a separate
 origin. Enter payment-provider credentials directly in Render's environment
 settings; never put them in Git or the frontend.
+
+The web container starts Apache without running database migrations, so a
+database connection problem does not take the public site offline. After
+configuring `DB_URL`, run `php artisan migrate --force` once from the Render
+service shell to prepare the database. Database-backed API features require
+this step and a reachable PostgreSQL database.
 
 Towny city pages list all residents and show connection status; publish the
 updated `minecraft-plugin/target/zuriland-towny-sync-1.0.1.jar` to the Minecraft
