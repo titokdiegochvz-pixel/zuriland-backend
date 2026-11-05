@@ -526,6 +526,40 @@
     line-height: 1.4 !important;
 }
 
+.roster-player-count {
+    margin: 12px 0 0;
+    color: #c4c2d3;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+}
+
+.server-player-list {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    margin-top: 12px;
+}
+
+.town-resident-details {
+    margin-top: 18px;
+    border-top: 1px solid #302d46;
+}
+
+.town-resident-details > summary {
+    padding: 14px 0 0;
+    color: #d7c8f2;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.town-resident-details > summary:hover {
+    color: #f0e8ff;
+}
+
+.town-resident-details .town-list {
+    margin-top: 13px;
+}
+
 .town-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

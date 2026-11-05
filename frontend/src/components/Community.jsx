@@ -114,6 +114,12 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
             .sort((first, second) => (second.players?.length || 0) - (first.players?.length || 0))
             .slice(0, 3)
         : [];
+    const allPlayers = Array.isArray(snapshot?.players)
+        ? [...snapshot.players].sort((first, second) =>
+            first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
+        )
+        : [];
+    const onlinePlayerCount = allPlayers.filter((player) => player.online).length;
 
     return (
         <section className="community-section">
@@ -228,8 +234,8 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                 <section className="town-roster" id="town-roster" aria-labelledby="town-roster-title">
                     <div className="roster-toolbar">
                         <div>
-                            <h3 id="town-roster-title">Jugadores de Towny</h3>
-                            <p>Residentes de cada ciudad y su estado actual.</p>
+                            <h3 id="town-roster-title">Jugadores del servidor</h3>
+                            <p>Todos los jugadores que han entrado, estén en línea o no.</p>
                         </div>
                         <button
                             type="button"
@@ -251,6 +257,14 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         </p>
                     )}
 
+                    {!isLoading && !error && (
+                        <p className="roster-player-count" aria-live="polite">
+                            {allPlayers.length} {allPlayers.length === 1 ? 'jugador registrado' : 'jugadores registrados'}
+                            {' · '}{onlinePlayerCount} en línea
+                            {' · '}{allPlayers.length - onlinePlayerCount} desconectados
+                        </p>
+                    )}
+
                     {error && (
                         <div className="roster-error" role="alert">
                             <span>{error}</span>
@@ -269,49 +283,70 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                                 <div className="roster-skeleton" key={item} />
                             ))}
                         </div>
-                    ) : snapshot?.towns.length ? (
-                        <div className="town-list">
-                            {snapshot.towns.map((town, index) => {
-                                const players = [...(town.players || [])].sort((first, second) =>
-                                    first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
-                                );
-                                const onlineCount = players.filter((player) => player.online).length;
-
-                                return (
-                                    <section className="town-group" id={`town-${index}`} key={town.name}>
-                                        <div className="town-heading">
-                                            <h4>{town.name}</h4>
-                                            <span>
-                                                {onlineCount} / {players.length} en línea
-                                            </span>
-                                        </div>
-
-                                        {players.length ? (
-                                            <ul className="player-list">
-                                                {players.map((player) => (
-                                                    <li
-                                                        className={`player-row ${player.online ? 'is-online' : 'is-offline'}`}
-                                                        key={player.name}
-                                                    >
-                                                        <PlayerSkin name={player.name} />
-                                                        <span className="player-name">{player.name}</span>
-                                                        <span className="player-presence">
-                                                            <span className="player-status-dot" />
-                                                            {player.online ? 'Conectado' : 'Desconectado'}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="town-empty">Esta ciudad todavía no tiene residentes.</p>
-                                        )}
-                                    </section>
-                                );
-                            })}
-                        </div>
+                    ) : allPlayers.length ? (
+                        <ul className="player-list server-player-list">
+                            {allPlayers.map((player) => (
+                                <li
+                                    className={`player-row ${player.online ? 'is-online' : 'is-offline'}`}
+                                    key={player.name}
+                                >
+                                    <PlayerSkin name={player.name} />
+                                    <span className="player-name">{player.name}</span>
+                                    <span className="player-presence">
+                                        <span className="player-status-dot" />
+                                        {player.online ? 'Conectado' : 'Desconectado'}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
                     ) : !error ? (
-                        <p className="roster-empty">Aún no hay ciudades disponibles.</p>
+                        <p className="roster-empty">Aún no hay jugadores registrados.</p>
                     ) : null}
+
+                    {!isLoading && snapshot?.towns.length > 0 && (
+                        <details className="town-resident-details">
+                            <summary>Ver residentes agrupados por ciudad</summary>
+                            <div className="town-list">
+                                {snapshot.towns.map((town, index) => {
+                                    const players = [...(town.players || [])].sort((first, second) =>
+                                        first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
+                                    );
+                                    const onlineCount = players.filter((player) => player.online).length;
+
+                                    return (
+                                        <section className="town-group" id={`town-${index}`} key={town.name}>
+                                            <div className="town-heading">
+                                                <h4>{town.name}</h4>
+                                                <span>
+                                                    {onlineCount} / {players.length} en línea
+                                                </span>
+                                            </div>
+
+                                            {players.length ? (
+                                                <ul className="player-list">
+                                                    {players.map((player) => (
+                                                        <li
+                                                            className={`player-row ${player.online ? 'is-online' : 'is-offline'}`}
+                                                            key={player.name}
+                                                        >
+                                                            <PlayerSkin name={player.name} />
+                                                            <span className="player-name">{player.name}</span>
+                                                            <span className="player-presence">
+                                                                <span className="player-status-dot" />
+                                                                {player.online ? 'Conectado' : 'Desconectado'}
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="town-empty">Esta ciudad todavía no tiene residentes.</p>
+                                            )}
+                                        </section>
+                                    );
+                                })}
+                            </div>
+                        </details>
+                    )}
                 </section>
             </div>
         </section>
