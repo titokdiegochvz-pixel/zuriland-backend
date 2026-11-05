@@ -126,11 +126,12 @@ After deployment, set `APP_URL` to the API's public URL. Set
 origin. Enter payment-provider credentials directly in Render's environment
 settings; never put them in Git or the frontend.
 
-The web container starts Apache without running database migrations, so a
-database connection problem does not take the public site offline. After
-configuring `DB_URL`, run `php artisan migrate --force` once from the Render
-service shell to prepare the database. Database-backed API features require
-this step and a reachable PostgreSQL database.
+The web container starts Apache without running database migrations, and
+serves React pages directly so a database or Laravel configuration problem
+does not take the public site offline. The `/api/*` and `/up` routes continue
+through Laravel. After configuring `DB_URL`, run `php artisan migrate --force`
+once from the Render service shell to prepare the database. Database-backed
+API features require this step and a reachable PostgreSQL database.
 
 Towny city pages list all residents and show connection status; publish the
 updated `minecraft-plugin/target/zuriland-towny-sync-1.0.1.jar` to the Minecraft

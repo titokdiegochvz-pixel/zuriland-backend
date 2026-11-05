@@ -3,6 +3,8 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    DirectoryIndex site/index.html index.php
+
     RewriteEngine On
 
     # Handle Authorization Header
@@ -17,6 +19,13 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
+
+    # Serve React pages directly so the public site does not depend on Laravel or the database.
+    RewriteCond %{REQUEST_URI} !^/api(?:/|$) [NC]
+    RewriteCond %{REQUEST_URI} !^/up$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ site/index.html [L]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
