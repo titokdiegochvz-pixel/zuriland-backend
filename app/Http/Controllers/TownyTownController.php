@@ -229,8 +229,46 @@ class TownyTownController extends Controller
             ))
         );
 
+        $previousSnapshot = DB::table('towny_town_snapshots')->where('id', 1)->first();
+        $previousData = $previousSnapshot
+            ? json_decode($previousSnapshot->data, true, 512, JSON_THROW_ON_ERROR)
+            : [];
+        $previousTowns = array_is_list($previousData)
+            ? $previousData
+            : ($previousData['towns'] ?? []);
+        $previousPlayers = array_is_list($previousData)
+            ? []
+            : ($previousData['players'] ?? []);
+
+        if (! $previousPlayers) {
+            foreach ($previousTowns as $town) {
+                foreach ($town['players'] ?? $town['residents'] ?? [] as $player) {
+                    $previousPlayers[] = is_string($player)
+                        ? ['name' => $player, 'kills' => 0]
+                        : $player;
+                }
+            }
+        }
+
+        $playersByName = [];
+
+        foreach ($previousPlayers as $player) {
+            $player = is_string($player)
+                ? ['name' => $player, 'kills' => 0]
+                : $player;
+            $playersByName[strtolower($player['name'])] = [
+                'name' => $player['name'],
+                'kills' => (int) ($player['kills'] ?? 0),
+                'online' => false,
+            ];
+        }
+
+        foreach ($players as $player) {
+            $playersByName[strtolower($player['name'])] = $player;
+        }
+
+        $players = array_values($playersByName);
         $now = now();
-        $exists = DB::table('towny_town_snapshots')->where('id', 1)->exists();
         $values = [
             'data' => json_encode([
                 'towns' => $towns,
@@ -239,7 +277,7 @@ class TownyTownController extends Controller
             'updated_at' => $now,
         ];
 
-        if (! $exists) {
+        if (! $previousSnapshot) {
             $values['created_at'] = $now;
         }
 

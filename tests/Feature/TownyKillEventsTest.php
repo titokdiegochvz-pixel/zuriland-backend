@@ -184,6 +184,53 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonPath('towns.0.players.1.online', false);
     }
 
+    public function test_town_snapshot_retains_players_after_they_leave_and_marks_them_offline(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    ['name' => 'Atlantis', 'players' => []],
+                ],
+                'players' => [
+                    ['name' => 'Yoyanac', 'kills' => 0, 'online' => true],
+                    ['name' => '1_LU_1', 'kills' => 0, 'online' => true],
+                    ['name' => 'CurrentPlayer', 'kills' => 2, 'online' => true],
+                ],
+            ])
+            ->assertOk();
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    ['name' => 'Atlantis', 'players' => []],
+                ],
+                'players' => [
+                    ['name' => 'CurrentPlayer', 'kills' => 2, 'online' => true],
+                ],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonFragment([
+                'name' => 'Yoyanac',
+                'kills' => 0,
+                'online' => false,
+            ])
+            ->assertJsonFragment([
+                'name' => '1_LU_1',
+                'kills' => 0,
+                'online' => false,
+            ])
+            ->assertJsonFragment([
+                'name' => 'CurrentPlayer',
+                'kills' => 2,
+                'online' => true,
+            ]);
+    }
+
     public function test_town_snapshot_requires_the_sync_token(): void
     {
         config(['services.towny.sync_token' => 'sync-secret']);
