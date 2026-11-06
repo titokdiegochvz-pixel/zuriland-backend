@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
+import { useMinecraftStatus } from '../context/MinecraftStatusContext';
 import {
     ArrowRightIcon,
     BookIcon,
@@ -32,6 +33,12 @@ const PlayerSkin = ({ name }) => {
 
 const Community = ({ onOpenRanking, onOpenRules }) => {
     const navigate = useNavigate();
+    const {
+        status: minecraftStatus,
+        players: liveServerPlayerCount,
+        playerNames: livePlayerNames,
+        playerNamesAvailable,
+    } = useMinecraftStatus();
     const [snapshot, setSnapshot] = useState(null);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -114,13 +121,37 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
             .sort((first, second) => (second.players?.length || 0) - (first.players?.length || 0))
             .slice(0, 3)
         : [];
-    const allPlayers = Array.isArray(snapshot?.players)
-        ? [...snapshot.players].sort((first, second) =>
-            first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
-        )
-        : [];
+    const townyPlayers = Array.isArray(snapshot?.players) ? snapshot.players : [];
+    const playersByName = new Map(
+        townyPlayers.map((player) => [player.name.toLowerCase(), player])
+    );
+    livePlayerNames.forEach((name) => {
+        const key = name.toLowerCase();
+        const knownPlayer = playersByName.get(key);
+        playersByName.set(key, knownPlayer
+            ? { ...knownPlayer, online: true }
+            : { name, kills: 0, online: true });
+    });
+
+    const hasCompleteLivePlayerList = minecraftStatus === 'online'
+        && playerNamesAvailable
+        && livePlayerNames.length === liveServerPlayerCount;
+    if (hasCompleteLivePlayerList) {
+        const liveNames = new Set(livePlayerNames.map((name) => name.toLowerCase()));
+        playersByName.forEach((player, key) => {
+            playersByName.set(key, { ...player, online: liveNames.has(key) });
+        });
+    }
+
+    const allPlayers = [...playersByName.values()].sort((first, second) =>
+        first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
+    );
     const newPlayers = Array.isArray(snapshot?.new_players) ? snapshot.new_players : [];
-    const onlinePlayerCount = allPlayers.filter((player) => player.online).length;
+    const rosterOnlineCount = allPlayers.filter((player) => player.online).length;
+    const onlinePlayerCount = minecraftStatus === 'online'
+        ? Math.max(rosterOnlineCount, liveServerPlayerCount)
+        : rosterOnlineCount;
+    const unidentifiedOnlineCount = Math.max(0, onlinePlayerCount - rosterOnlineCount);
 
     return (
         <section className="community-section">
@@ -262,7 +293,14 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                         <p className="roster-player-count" aria-live="polite">
                             {allPlayers.length} {allPlayers.length === 1 ? 'jugador registrado' : 'jugadores registrados'}
                             {' · '}{onlinePlayerCount} en línea
-                            {' · '}{allPlayers.length - onlinePlayerCount} desconectados
+                            {' · '}{Math.max(0, allPlayers.length - rosterOnlineCount)} desconectados
+                        </p>
+                    )}
+
+                    {!isLoading && !error && unidentifiedOnlineCount > 0 && (
+                        <p className="roster-updated" aria-live="polite">
+                            {unidentifiedOnlineCount} {unidentifiedOnlineCount === 1 ? 'conexión está' : 'conexiones están'} activa
+                            {unidentifiedOnlineCount === 1 ? '' : 's'}, pero Towny aún no {unidentifiedOnlineCount === 1 ? 'la identifica' : 'las identifica'}.
                         </p>
                     )}
 

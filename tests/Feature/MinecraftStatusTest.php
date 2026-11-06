@@ -27,7 +27,11 @@ class MinecraftStatusTest extends TestCase
         Http::fake([
             'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg' => Http::response([
                 'online' => true,
-                'players' => ['online' => 1, 'max' => 20],
+                'players' => [
+                    'online' => 1,
+                    'max' => 20,
+                    'list' => [['name_clean' => 'YisuaUTU']],
+                ],
             ]),
         ]);
 
@@ -35,7 +39,12 @@ class MinecraftStatusTest extends TestCase
             ->assertOk()
             ->assertExactJson([
                 'online' => true,
-                'players' => ['online' => 1, 'max' => 20],
+                'players' => [
+                    'online' => 1,
+                    'max' => 20,
+                    'list' => ['YisuaUTU'],
+                    'list_available' => true,
+                ],
             ]);
 
         Http::assertSent(fn ($request) => $request->url() === 'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg');
@@ -53,7 +62,12 @@ class MinecraftStatusTest extends TestCase
             ->assertOk()
             ->assertExactJson([
                 'online' => false,
-                'players' => ['online' => 0, 'max' => 0],
+                'players' => [
+                    'online' => 0,
+                    'max' => 0,
+                    'list' => [],
+                    'list_available' => false,
+                ],
             ]);
     }
 
@@ -75,7 +89,11 @@ class MinecraftStatusTest extends TestCase
         $this->withToken('sync-secret')
             ->postJson('/api/minecraft/status', [
                 'online' => true,
-                'players' => ['online' => 3, 'max' => 120],
+                'players' => [
+                    'online' => 3,
+                    'max' => 120,
+                    'list' => [['name' => 'YisuaUTU']],
+                ],
             ])
             ->assertOk()
             ->assertJsonPath('message', 'Estado de Minecraft sincronizado.');
@@ -86,10 +104,47 @@ class MinecraftStatusTest extends TestCase
             ->assertOk()
             ->assertExactJson([
                 'online' => true,
-                'players' => ['online' => 3, 'max' => 120],
+                'players' => [
+                    'online' => 3,
+                    'max' => 120,
+                    'list' => ['YisuaUTU'],
+                    'list_available' => true,
+                ],
             ]);
 
         Http::assertNothingSent();
+    }
+
+    public function test_cached_plugin_count_is_enriched_with_online_names_from_the_status_provider(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/minecraft/status', [
+                'online' => true,
+                'players' => ['online' => 2, 'max' => 120],
+            ])
+            ->assertOk();
+
+        Http::fake([
+            'https://api.mcstatus.io/v2/status/java/pgsql-stained.tun.ply.gg' => Http::response([
+                'online' => true,
+                'players' => [
+                    'online' => 2,
+                    'max' => 120,
+                    'list' => [
+                        ['name_clean' => 'belze__deuz'],
+                        ['name_clean' => 'YisuaUTU'],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $this->getJson('/api/minecraft/status')
+            ->assertOk()
+            ->assertJsonPath('players.online', 2)
+            ->assertJsonPath('players.list', ['belze__deuz', 'YisuaUTU'])
+            ->assertJsonPath('players.list_available', true);
     }
 
     public function test_plugin_push_requires_the_towny_sync_token(): void

@@ -16,6 +16,20 @@ class MinecraftStatusController extends Controller
         try {
             $status = Cache::get('minecraft.server.status');
             if ($status !== null) {
+                if (! ($status['players']['list_available'] ?? false)) {
+                    try {
+                        $playerNames = $this->cachedOnlinePlayerNames();
+                        $status['players']['list'] = $playerNames ?? [];
+                        $status['players']['list_available'] = $playerNames !== null;
+                    } catch (ConnectionException|RequestException $exception) {
+                        Log::warning('Unable to fetch Minecraft player names.', [
+                            'message' => $exception->getMessage(),
+                        ]);
+                        $status['players']['list'] = [];
+                        $status['players']['list_available'] = false;
+                    }
+                }
+
                 return response()->json($status);
             }
 
@@ -34,11 +48,15 @@ class MinecraftStatusController extends Controller
                     return null;
                 }
 
+                $playerNames = $this->playerNames($data);
+
                 return [
                     'online' => $data['online'],
                     'players' => [
                         'online' => max(0, (int) data_get($data, 'players.online', 0)),
                         'max' => max(0, (int) data_get($data, 'players.max', 0)),
+                        'list' => $playerNames ?? [],
+                        'list_available' => $playerNames !== null,
                     ],
                 ];
             });
@@ -79,6 +97,8 @@ class MinecraftStatusController extends Controller
             'online' => ['required', 'boolean'],
             'players.online' => ['required', 'integer', 'min:0', 'max:1000000'],
             'players.max' => ['required', 'integer', 'min:0', 'max:1000000'],
+            'players.list' => ['sometimes', 'array', 'max:1000'],
+            'players.list.*.name' => ['required', 'string', 'max:16'],
         ]);
 
         $status = [
@@ -86,6 +106,8 @@ class MinecraftStatusController extends Controller
             'players' => [
                 'online' => $validated['players']['online'],
                 'max' => $validated['players']['max'],
+                'list' => array_values(array_unique(array_column($validated['players']['list'] ?? [], 'name'))),
+                'list_available' => array_key_exists('list', $validated['players']),
             ],
         ];
 
@@ -94,5 +116,47 @@ class MinecraftStatusController extends Controller
         return response()->json([
             'message' => 'Estado de Minecraft sincronizado.',
         ]);
+    }
+
+    private function cachedOnlinePlayerNames(): ?array
+    {
+        return Cache::remember('minecraft.server.player_names', now()->addSeconds(10), function () {
+            $response = Http::acceptJson()
+                ->timeout(5)
+                ->get(
+                    rtrim(config('services.minecraft.status_url'), '/').'/'.config('services.minecraft.host')
+                );
+            $response->throw();
+
+            $data = $response->json();
+            if (! is_array($data) || ! is_bool($data['online'] ?? null)) {
+                Log::warning('Minecraft status provider returned invalid player-list data.');
+
+                return null;
+            }
+
+            return $this->playerNames($data);
+        });
+    }
+
+    private function playerNames(array $data): ?array
+    {
+        $players = data_get($data, 'players.list');
+        if (! is_array($players)) {
+            return null;
+        }
+
+        $names = [];
+        foreach ($players as $player) {
+            $name = is_array($player)
+                ? ($player['name_clean'] ?? $player['name_raw'] ?? null)
+                : null;
+
+            if (is_string($name) && $name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        return array_values(array_unique($names));
     }
 }

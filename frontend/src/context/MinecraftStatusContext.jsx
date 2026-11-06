@@ -4,12 +4,16 @@ import { API_URL } from '../config/api';
 const MinecraftStatusContext = createContext({
     status: 'loading',
     players: 0,
+    playerNames: [],
+    playerNamesAvailable: false,
 });
 
 export const MinecraftStatusProvider = ({ children }) => {
     const [serverStatus, setServerStatus] = useState({
         status: 'loading',
         players: 0,
+        playerNames: [],
+        playerNamesAvailable: false,
     });
 
     useEffect(() => {
@@ -39,11 +43,20 @@ export const MinecraftStatusProvider = ({ children }) => {
                     setServerStatus({
                         status: data.online ? 'online' : 'offline',
                         players: data.online ? data.players.online : 0,
+                        playerNames: data.online && Array.isArray(data.players.list)
+                            ? data.players.list
+                            : [],
+                        playerNamesAvailable: data.online && data.players.list_available === true,
                     });
                 }
             } catch (error) {
                 if (isMounted && error.name !== 'AbortError') {
-                    setServerStatus({ status: 'unavailable', players: 0 });
+                    setServerStatus({
+                        status: 'unavailable',
+                        players: 0,
+                        playerNames: [],
+                        playerNamesAvailable: false,
+                    });
                 }
             }
         };
