@@ -534,6 +534,89 @@
     line-height: 1.5;
 }
 
+.roster-newcomers {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #37334e;
+}
+
+.roster-newcomers-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.roster-newcomers-heading h4 {
+    margin: 0;
+    color: #f0e9fc;
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.roster-newcomers-heading p {
+    margin: 5px 0 0;
+    color: #c4c2d3;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.roster-newcomers-heading > span {
+    flex: 0 0 auto;
+    color: #d7c8f2;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+}
+
+.newcomer-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 2px 18px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.newcomer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 50px;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.newcomer-row:hover {
+    background: #1b1b2c;
+}
+
+.newcomer-row .player-skin {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+}
+
+.newcomer-time {
+    flex: 0 1 auto;
+    color: #c4c2d3;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.newcomer-row .player-presence {
+    margin-left: auto;
+}
+
+.newcomer-row .player-presence.is-online {
+    color: #65e6a1;
+}
+
+.newcomer-row .player-presence.is-offline {
+    color: #ff9292;
+}
+
 .server-player-list {
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     margin-top: 12px;
@@ -964,6 +1047,18 @@
     .player-presence {
         gap: 5px;
         font-size: 10px;
+    }
+
+    .newcomer-list {
+        grid-template-columns: 1fr;
+    }
+
+    .newcomer-row {
+        gap: 8px;
+    }
+
+    .newcomer-time {
+        font-size: 9px;
     }
 }
 

@@ -18,6 +18,7 @@ class TownyKillEventsTest extends TestCase
             ->assertExactJson([
                 'towns' => [],
                 'players' => [],
+                'new_players' => [],
                 'updated_at' => null,
             ]);
     }
@@ -41,8 +42,94 @@ class TownyKillEventsTest extends TestCase
                 'message' => 'Los datos de Towny no están disponibles. Revisa la conexión y las migraciones de la base de datos.',
                 'towns' => [],
                 'players' => [],
+                'new_players' => [],
                 'updated_at' => null,
             ]);
+    }
+
+    public function test_roster_sync_tracks_players_seen_for_the_first_time_without_recounting_existing_players(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+        DB::table('towny_town_snapshots')->insert([
+            'id' => 1,
+            'data' => json_encode([
+                'towns' => [],
+                'players' => [
+                    ['name' => 'ExistingPlayer', 'kills' => 3, 'online' => false],
+                ],
+            ], JSON_THROW_ON_ERROR),
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
+        ]);
+
+        $sync = [
+            'towns' => [
+                ['name' => 'Atlantis', 'players' => []],
+            ],
+            'players' => [
+                ['name' => 'ExistingPlayer', 'kills' => 3, 'online' => true],
+                ['name' => 'NewPlayer', 'kills' => 0, 'online' => true],
+            ],
+        ];
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', $sync)
+            ->assertOk();
+
+        $firstResponse = $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonCount(1, 'new_players')
+            ->assertJsonPath('new_players.0.name', 'NewPlayer')
+            ->assertJsonPath('new_players.0.online', true);
+
+        $firstSeenAt = $firstResponse->json('new_players.0.first_seen_at');
+
+        $sync['players'][0]['online'] = false;
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', $sync)
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonCount(1, 'new_players')
+            ->assertJsonPath('new_players.0.name', 'NewPlayer')
+            ->assertJsonPath('new_players.0.online', true)
+            ->assertJsonPath('new_players.0.first_seen_at', $firstSeenAt);
+    }
+
+    public function test_public_roster_only_lists_first_seen_players_from_the_last_24_hours(): void
+    {
+        DB::table('towny_town_snapshots')->insert([
+            'id' => 1,
+            'data' => json_encode([
+                'towns' => [],
+                'players' => [],
+                'player_history' => [
+                    'recentplayer' => [
+                        'name' => 'RecentPlayer',
+                        'first_seen_at' => now()->subHours(12)->toIso8601String(),
+                        'baseline' => false,
+                    ],
+                    'oldplayer' => [
+                        'name' => 'OldPlayer',
+                        'first_seen_at' => now()->subHours(25)->toIso8601String(),
+                        'baseline' => false,
+                    ],
+                    'baselineplayer' => [
+                        'name' => 'BaselinePlayer',
+                        'first_seen_at' => now()->subHours(1)->toIso8601String(),
+                        'baseline' => true,
+                    ],
+                ],
+            ], JSON_THROW_ON_ERROR),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonCount(1, 'new_players')
+            ->assertJsonPath('new_players.0.name', 'RecentPlayer');
     }
 
     public function test_town_snapshot_publishes_all_players_including_players_without_a_town(): void

@@ -119,6 +119,7 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
             first.name.localeCompare(second.name, 'es', { sensitivity: 'base' })
         )
         : [];
+    const newPlayers = Array.isArray(snapshot?.new_players) ? snapshot.new_players : [];
     const onlinePlayerCount = allPlayers.filter((player) => player.online).length;
 
     return (
@@ -275,6 +276,45 @@ const Community = ({ onOpenRanking, onOpenRules }) => {
                                 Reintentar
                             </button>
                         </div>
+                    )}
+
+                    {!isLoading && !error && (
+                        <section className="roster-newcomers" aria-labelledby="roster-newcomers-title">
+                            <div className="roster-newcomers-heading">
+                                <div>
+                                    <h4 id="roster-newcomers-title">Nuevos en las últimas 24 horas</h4>
+                                    <p>Registrados por primera vez desde esta actualización; no incluye visitas anteriores.</p>
+                                </div>
+                                <span>
+                                    {newPlayers.length} {newPlayers.length === 1 ? 'jugador' : 'jugadores'}
+                                </span>
+                            </div>
+
+                            {newPlayers.length ? (
+                                <ul className="newcomer-list">
+                                    {newPlayers.map((player) => (
+                                        <li className="newcomer-row" key={player.name}>
+                                            <PlayerSkin name={player.name} />
+                                            <span className="player-name">{player.name}</span>
+                                            <span className="newcomer-time">
+                                                Visto {new Date(player.first_seen_at).toLocaleString('es-MX', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </span>
+                                            <span className={`player-presence ${player.online ? 'is-online' : 'is-offline'}`}>
+                                                <span className="player-status-dot" />
+                                                {player.online ? 'Conectado' : 'Desconectado'}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="roster-empty">Aún no se han detectado jugadores nuevos.</p>
+                            )}
+                        </section>
                     )}
 
                     {isLoading ? (

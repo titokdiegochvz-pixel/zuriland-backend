@@ -26,6 +26,7 @@ class TownyTownController extends Controller
                 'message' => 'Los datos de Towny no están disponibles. Revisa la conexión y las migraciones de la base de datos.',
                 'towns' => [],
                 'players' => [],
+                'new_players' => [],
                 'updated_at' => null,
             ], 503);
         }
@@ -103,6 +104,39 @@ class TownyTownController extends Controller
             }
         }
         $players = array_values($playersByName);
+        $playerHistory = ! array_is_list($snapshotData) && is_array($snapshotData['player_history'] ?? null)
+            ? $snapshotData['player_history']
+            : [];
+        $newPlayers = [];
+        $since = now()->subDay();
+
+        foreach ($playerHistory as $entry) {
+            if (
+                ! is_array($entry)
+                || ! is_string($entry['name'] ?? null)
+                || ! is_string($entry['first_seen_at'] ?? null)
+                || ($entry['baseline'] ?? true)
+            ) {
+                continue;
+            }
+
+            $firstSeenAt = Carbon::parse($entry['first_seen_at']);
+            if ($firstSeenAt->lt($since)) {
+                continue;
+            }
+
+            $player = $playersByName[strtolower($entry['name'])] ?? null;
+            $newPlayers[] = [
+                'name' => $entry['name'],
+                'online' => (bool) ($player['online'] ?? false),
+                'first_seen_at' => $firstSeenAt->toIso8601String(),
+            ];
+        }
+
+        usort(
+            $newPlayers,
+            fn (array $first, array $second) => strcmp($second['first_seen_at'], $first['first_seen_at'])
+        );
         $townsByName = [];
 
         foreach ($towns as $town) {
@@ -159,6 +193,7 @@ class TownyTownController extends Controller
         return response()->json([
             'towns' => $towns,
             'players' => $players,
+            'new_players' => $newPlayers,
             'updated_at' => $updatedAt,
         ]);
     }
@@ -250,6 +285,37 @@ class TownyTownController extends Controller
             }
         }
 
+        $now = now();
+        $playerHistory = ! array_is_list($previousData) && is_array($previousData['player_history'] ?? null)
+            ? $previousData['player_history']
+            : [];
+
+        if (! $playerHistory) {
+            foreach ($previousPlayers as $player) {
+                $player = is_string($player)
+                    ? ['name' => $player]
+                    : $player;
+                $playerHistory[strtolower($player['name'])] = [
+                    'name' => $player['name'],
+                    'first_seen_at' => ($previousSnapshot?->updated_at
+                        ? Carbon::parse($previousSnapshot->updated_at)
+                        : $now)->toIso8601String(),
+                    'baseline' => true,
+                ];
+            }
+        }
+
+        foreach ($players as $player) {
+            $playerKey = strtolower($player['name']);
+            if (! isset($playerHistory[$playerKey])) {
+                $playerHistory[$playerKey] = [
+                    'name' => $player['name'],
+                    'first_seen_at' => $now->toIso8601String(),
+                    'baseline' => false,
+                ];
+            }
+        }
+
         $playersByName = [];
 
         foreach ($previousPlayers as $player) {
@@ -268,11 +334,11 @@ class TownyTownController extends Controller
         }
 
         $players = array_values($playersByName);
-        $now = now();
         $values = [
             'data' => json_encode([
                 'towns' => $towns,
                 'players' => $players,
+                'player_history' => $playerHistory,
             ], JSON_THROW_ON_ERROR),
             'updated_at' => $now,
         ];
