@@ -184,6 +184,36 @@ class TownyKillEventsTest extends TestCase
             ->assertJsonPath('towns.0.players.1.online', false);
     }
 
+    public function test_town_snapshot_accepts_legacy_players_payloads_without_kill_counts(): void
+    {
+        config(['services.towny.sync_token' => 'sync-secret']);
+
+        $this->withToken('sync-secret')
+            ->postJson('/api/towny/towns', [
+                'towns' => [
+                    [
+                        'name' => 'Thalassia',
+                        'players' => [
+                            ['name' => 'LegacyTownPlayer', 'online' => true],
+                        ],
+                    ],
+                ],
+                'players' => [
+                    ['name' => 'LegacyNomad', 'online' => false],
+                ],
+            ])
+            ->assertOk();
+
+        $this->getJson('/api/towny/kills')
+            ->assertOk()
+            ->assertJsonPath('towns.0.players.0.name', 'LegacyTownPlayer')
+            ->assertJsonPath('towns.0.players.0.kills', 0)
+            ->assertJsonPath('towns.0.players.0.online', true)
+            ->assertJsonPath('players.0.name', 'LegacyNomad')
+            ->assertJsonPath('players.0.kills', 0)
+            ->assertJsonPath('players.0.online', false);
+    }
+
     public function test_town_snapshot_retains_players_after_they_leave_and_marks_them_offline(): void
     {
         config(['services.towny.sync_token' => 'sync-secret']);

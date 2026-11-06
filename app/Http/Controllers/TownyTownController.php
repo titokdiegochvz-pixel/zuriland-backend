@@ -185,16 +185,16 @@ class TownyTownController extends Controller
             'towns' => ['required', 'array', 'max:1000'],
             'towns.*.name' => ['required', 'string', 'max:100'],
             'towns.*.players' => ['sometimes', 'array', 'max:10000'],
-            'towns.*.players.*' => ['required', 'array:name,kills,online'],
+            'towns.*.players.*' => ['required', 'array'],
             'towns.*.players.*.name' => ['required', 'string', 'max:16'],
-            'towns.*.players.*.kills' => ['required', 'integer', 'min:0', 'max:1000000000'],
+            'towns.*.players.*.kills' => ['sometimes', 'integer', 'min:0', 'max:1000000000'],
             'towns.*.players.*.online' => ['sometimes', 'boolean'],
             'towns.*.residents' => ['sometimes', 'array', 'max:10000'],
             'towns.*.residents.*' => ['required', 'string', 'max:16'],
             'players' => ['sometimes', 'array', 'max:10000'],
-            'players.*' => ['required', 'array:name,kills,online'],
+            'players.*' => ['required', 'array'],
             'players.*.name' => ['required', 'string', 'max:16'],
-            'players.*.kills' => ['required', 'integer', 'min:0', 'max:1000000000'],
+            'players.*.kills' => ['sometimes', 'integer', 'min:0', 'max:1000000000'],
             'players.*.online' => ['sometimes', 'boolean'],
         ]);
 
@@ -206,7 +206,7 @@ class TownyTownController extends Controller
             $players = array_map(
                 fn (array $player) => [
                     'name' => $player['name'],
-                    'kills' => $player['kills'],
+                    'kills' => (int) ($player['kills'] ?? 0),
                     'online' => (bool) ($player['online'] ?? true),
                 ],
                 $players
@@ -220,7 +220,7 @@ class TownyTownController extends Controller
         $players = array_map(
             fn (array $player) => [
                 'name' => $player['name'],
-                'kills' => $player['kills'],
+                'kills' => (int) ($player['kills'] ?? 0),
                 'online' => (bool) ($player['online'] ?? true),
             ],
             $validated['players'] ?? array_merge(...array_map(

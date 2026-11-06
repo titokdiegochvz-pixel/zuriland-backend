@@ -12,6 +12,7 @@ import Register from './components/Register';
 import { AuthProvider } from './auth/AuthContext';
 import Cart from './components/Cart';
 import { CartProvider, useCart } from './store/CartContext';
+import { MinecraftStatusProvider } from './context/MinecraftStatusContext';
 
 import './App.css';
 
@@ -41,36 +42,38 @@ function App() {
         <AuthProvider>
             <CartProvider>
                 <Router>
-                    <div>
-                        <ServerHeader />
-                        <Header />
+                    <MinecraftStatusProvider>
+                        <div>
+                            <ServerHeader />
+                            <Header />
 
-                        <main>
-                            <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/home" element={<Home />} />
-                            <Route path="/store" element={<Store />} />
-                            <Route path="/store/zuriland" element={<Store />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/community" element={<Community />} />
-                            <Route path="/ranking" element={<Ranking />} />
-                            <Route path="/rules" element={
-                                <section className="content-section">
-                                    <h2>Reglas del servidor</h2>
-                                    <p>1 Ser constantes en el server porfa.
-                                       2 No campear spawn
-                                       3 tengan su nacion en el server
-                                    </p>
-                                </section>
-                            } />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            <Route path="/pago-exitoso" element={<PagoExitoso />} />
-                            <Route path="/pago-cancelado" element={<PagoCancelado />} />
-                            <Route path="*" element={<Navigate to="/" />} />
-                            </Routes>
-                        </main>
-                    </div>
+                            <main>
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/home" element={<Home />} />
+                                    <Route path="/store" element={<Store />} />
+                                    <Route path="/store/zuriland" element={<Store />} />
+                                    <Route path="/cart" element={<Cart />} />
+                                    <Route path="/community" element={<Community />} />
+                                    <Route path="/ranking" element={<Ranking />} />
+                                    <Route path="/rules" element={
+                                        <section className="content-section">
+                                            <h2>Reglas del servidor</h2>
+                                            <p>1 Ser constantes en el server porfa.
+                                               2 No campear spawn
+                                               3 tengan su nacion en el server
+                                            </p>
+                                        </section>
+                                    } />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/register" element={<Register />} />
+                                    <Route path="/pago-exitoso" element={<PagoExitoso />} />
+                                    <Route path="/pago-cancelado" element={<PagoCancelado />} />
+                                    <Route path="*" element={<Navigate to="/" />} />
+                                </Routes>
+                            </main>
+                        </div>
+                    </MinecraftStatusProvider>
                 </Router>
             </CartProvider>
         </AuthProvider>

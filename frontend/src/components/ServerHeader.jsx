@@ -1,60 +1,15 @@
 
-import React, { useEffect, useState } from 'react';
-import { API_URL } from '../config/api';
+import React, { useState } from 'react';
+import { useMinecraftStatus } from '../context/MinecraftStatusContext';
 import { DiscordIcon, GamepadIcon } from './UiIcons';
 import './ServerHeader.css';
 
 const ServerHeader = () => {
-    const [estadoServidor, setEstadoServidor] = useState({ status: 'loading', players: 0 });
+    const { status, players } = useMinecraftStatus();
     const [ipCopiada, setIpCopiada] = useState(false);
+    const [mostrarGuia, setMostrarGuia] = useState(false);
 
     const ip = 'pgsql-stained.tun.ply.gg';
-
-    useEffect(() => {
-        let isMounted = true;
-        const controller = new AbortController();
-
-        const loadServerStatus = async () => {
-            try {
-                const response = await fetch(`${API_URL}/api/minecraft/status`, {
-                    signal: controller.signal,
-                    headers: { Accept: 'application/json' },
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (
-                    typeof data.online !== 'boolean'
-                    || !Number.isInteger(data.players?.online)
-                    || data.players.online < 0
-                ) {
-                    throw new Error('Invalid Minecraft status response');
-                }
-
-                if (isMounted) {
-                    setEstadoServidor({
-                        status: data.online ? 'online' : 'offline',
-                        players: data.online ? data.players.online : 0,
-                    });
-                }
-            } catch (error) {
-                if (isMounted && error.name !== 'AbortError') {
-                    setEstadoServidor({ status: 'unavailable', players: 0 });
-                }
-            }
-        };
-
-        loadServerStatus();
-        const interval = window.setInterval(loadServerStatus, 30_000);
-
-        return () => {
-            isMounted = false;
-            controller.abort();
-            window.clearInterval(interval);
-        };
-    }, []);
 
     const copiarIP = async () => {
         try {
@@ -76,12 +31,16 @@ const ServerHeader = () => {
                         <span className="banner-icon"><GamepadIcon /></span>
 
                         <div>
-                            <span className="banner-small" role="status" aria-live="polite">
-                                {estadoServidor.status === 'online'
-                                    ? `${estadoServidor.players} ${estadoServidor.players === 1 ? 'JUGADOR' : 'JUGADORES'} EN LÍNEA`
-                                    : estadoServidor.status === 'offline'
+                            <span
+                                className={`banner-small server-status-label server-status-label--${status}`}
+                                role="status"
+                                aria-live="polite"
+                            >
+                                {status === 'online'
+                                    ? `${players} ${players === 1 ? 'JUGADOR' : 'JUGADORES'} EN LÍNEA`
+                                    : status === 'offline'
                                         ? 'SERVIDOR DESCONECTADO'
-                                        : estadoServidor.status === 'loading'
+                                        : status === 'loading'
                                             ? 'CONSULTANDO JUGADORES'
                                             : 'JUGADORES NO DISPONIBLES'}
                             </span>
@@ -95,9 +54,9 @@ const ServerHeader = () => {
                         <button
                             type="button"
                             className="btn-play"
-                            onClick={copiarIP}
+                            onClick={() => setMostrarGuia(true)}
                         >
-                            {ipCopiada ? '¡IP copiada!' : 'Jugar ahora'}
+                            Jugar ahora
                         </button>
                     </div>
 
@@ -118,6 +77,44 @@ const ServerHeader = () => {
                     </a>
                 </div>
             </header>
+
+            {mostrarGuia && (
+                <div
+                    className="guia-overlay"
+                    onClick={() => setMostrarGuia(false)}
+                >
+                    <div
+                        className="guia-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Cómo entrar a ZuriLand"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="guia-cerrar"
+                            onClick={() => setMostrarGuia(false)}
+                            aria-label="Cerrar guía"
+                        >
+                            ×
+                        </button>
+                        <img
+                            src="/site/server-join-guide.png"
+                            alt="Instrucciones para agregar y conectar al servidor pgsql-stained.tun.ply.gg en Minecraft"
+                            className="guia-imagen"
+                            width={2152}
+                            height={731}
+                        />
+                        <button
+                            type="button"
+                            className="guia-copiar"
+                            onClick={copiarIP}
+                        >
+                            {ipCopiada ? '¡IP copiada!' : 'Copiar IP del servidor'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

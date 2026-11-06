@@ -9,12 +9,14 @@ import {
     UsersIcon,
     CartIcon,
 } from './UiIcons';
+import { useMinecraftStatus } from '../context/MinecraftStatusContext';
 import './Home.css';
 
 const SERVER_IP = 'pgsql-stained.tun.ply.gg';
 
 const Home = () => {
     const [copyMessage, setCopyMessage] = useState('');
+    const { status, players } = useMinecraftStatus();
 
     const copyServerAddress = async () => {
         try {
@@ -42,6 +44,46 @@ const Home = () => {
                     <span />
                 </div>
                 <p>Entra a jugar en pocos pasos. Copia la IP y agrégala en Minecraft Java.</p>
+                <div
+                    className={`home-live-status home-live-status--${status}`}
+                    role="status"
+                    aria-live="polite"
+                >
+                    <span className="home-live-status-dot" aria-hidden="true" />
+                    <div className="home-live-status-count">
+                        <span>
+                            {status === 'online'
+                                ? 'SERVIDOR EN LÍNEA'
+                                : status === 'offline'
+                                    ? 'SERVIDOR DESCONECTADO'
+                                    : status === 'loading'
+                                        ? 'CONSULTANDO SERVIDOR'
+                                        : 'ESTADO NO DISPONIBLE'}
+                        </span>
+                        <strong>
+                            {status === 'online'
+                                ? `${players} ${players === 1 ? 'jugador' : 'jugadores'} en línea`
+                                : status === 'loading'
+                                    ? 'Cargando estado…'
+                                    : status === 'offline'
+                                        ? 'No disponible para entrar'
+                                        : 'Intenta de nuevo en unos segundos'}
+                        </strong>
+                    </div>
+                    <span className="home-live-status-divider" aria-hidden="true" />
+                    <div className="home-live-address">
+                        <span>IP DEL SERVIDOR</span>
+                        <code>{SERVER_IP}</code>
+                    </div>
+                    <button
+                        type="button"
+                        className="home-live-copy"
+                        onClick={copyServerAddress}
+                    >
+                        <CopyIcon />
+                        Copiar IP
+                    </button>
+                </div>
                 <a className="home-play-button" href="#server-connect">
                     <PlayIcon />
                     Cómo entrar al servidor
