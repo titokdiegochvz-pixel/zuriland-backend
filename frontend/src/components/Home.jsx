@@ -137,6 +137,67 @@ const Home = () => {
                 )}
             </section>
 
+            <section className="server-context" aria-labelledby="server-context-title">
+                <header className="server-context-heading">
+                    <h2 id="server-context-title">¡Bienvenidos a ZuriLand!</h2>
+                    <p>
+                        ¿Buscas una experiencia diferente en Minecraft Vanilla? Un lugar donde
+                        puedas construir tu imperio, formar alianzas, hacer amigos y vivir
+                        emocionantes aventuras. Entonces prepárate: ZuriLand te está esperando.
+                    </p>
+                </header>
+
+                <div className="server-context-grid">
+                    <article className="server-context-block">
+                        <h3>Ciudades</h3>
+                        <p>
+                            El servidor contará con diferentes ciudades a las que los jugadores
+                            podrán pertenecer de manera aleatoria. Cada ciudad tendrá sus propios
+                            habitantes para que conozcas nuevos compañeros, hagas amistades y
+                            desarrolles tu hogar junto a ellos.
+                        </p>
+                    </article>
+
+                    <article className="server-context-block">
+                        <h3>Economía</h3>
+                        <p>
+                            ¡El comercio será parte fundamental de nuestra comunidad! Podrás
+                            conseguir recursos, comerciar con otros jugadores y hacer crecer tu
+                            riqueza.
+                        </p>
+                    </article>
+
+                    <article className="server-context-block">
+                        <h3>Días de paz</h3>
+                        <p>
+                            De lunes a sábado podrás vivir tranquilamente. Construye tu casa,
+                            consigue materiales, comercia, desarrolla tu ciudad y disfruta de la
+                            supervivencia sin preocuparte por ser atacado.
+                        </p>
+                    </article>
+
+                    <article className="server-context-block server-context-block--war">
+                        <h3>Domingos de guerra</h3>
+                        <p>
+                            Una vez a la semana, los domingos, habrá un periodo de tiempo limitado
+                            en el que todos los jugadores podrán atacarse entre sí. Será el momento
+                            de defender tu ciudad, demostrar tu habilidad y luchar por sobrevivir.
+                        </p>
+                        <p>
+                            Esta oportunidad de combate solamente estará disponible los domingos.
+                            Al terminar el evento, volverá la paz hasta el siguiente domingo.
+                        </p>
+                    </article>
+                </div>
+
+                <p className="server-context-closing">
+                    Construye, comercia, haz alianzas, crea amistades y prepárate para sobrevivir
+                    a los domingos de guerra. Aquí podrás vivir en paz seis días, pero el séptimo
+                    tendrás que estar preparado.
+                    <strong>Seis días de paz, un día de guerra.</strong>
+                </p>
+            </section>
+
             <nav className="home-feature-links" aria-label="Explora ZuriLand">
                 <Link to="/community" className="home-feature-link">
                     <UsersIcon />

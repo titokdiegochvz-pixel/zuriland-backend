@@ -412,6 +412,82 @@
     text-align: right;
 }
 
+.server-context {
+    width: min(960px, calc(100% - 40px));
+    box-sizing: border-box;
+    margin: 48px auto 0;
+    padding: 0 0 30px;
+    border-bottom: 1px solid #302d46;
+    color: #f5f2ff;
+    text-align: left;
+}
+
+.server-context-heading {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.server-context-heading h2 {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.server-context-heading p {
+    margin: 12px auto 0;
+    color: #d0c8df;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.server-context-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 40px;
+    margin-top: 30px;
+}
+
+.server-context-block {
+    padding-top: 14px;
+    border-top: 1px solid #51406e;
+}
+
+.server-context-block h3 {
+    margin: 0;
+    color: #e6d5ff;
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.server-context-block p {
+    margin: 8px 0 0;
+    color: #d0c8df;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.server-context-block p + p {
+    margin-top: 10px;
+}
+
+.server-context-closing {
+    max-width: 720px;
+    margin: 30px auto 0;
+    color: #d0c8df;
+    font-size: 14px;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.server-context-closing strong {
+    display: block;
+    margin-top: 8px;
+    color: #d9b8ff;
+    font-size: 16px;
+}
+
 .home-feature-links {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -661,6 +737,19 @@
         text-align: left;
     }
 
+    .server-context {
+        margin-top: 36px;
+    }
+
+    .server-context-heading p {
+        font-size: 14px;
+    }
+
+    .server-context-grid {
+        gap: 22px;
+        margin-top: 24px;
+    }
+
     .home-feature-links {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -691,8 +780,14 @@
     }
 
     .server-connect-panel,
-    .home-feature-links {
+    .home-feature-links,
+    .server-context {
         width: calc(100% - 28px);
+    }
+
+    .server-context-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
     }
 
     .home-live-status {
