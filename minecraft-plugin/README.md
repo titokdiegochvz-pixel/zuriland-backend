@@ -10,7 +10,7 @@ Install JDK 25 (the latest LTS release) and Maven, then run this directory:
 mvn package
 ```
 
-The plugin JAR is created at `target/zuriland-towny-sync-1.0.2.jar`.
+The plugin JAR is created at `target/zuriland-towny-sync-1.0.3.jar`.
 
 ## Configure
 
