@@ -43,6 +43,7 @@ class CheckoutSessionTest extends TestCase
         config([
             'services.stripe.secret' => 'sk_test_zuriland',
             'services.frontend.url' => 'https://zuriland-frontend.onrender.com',
+            'app.url' => 'https://zuriland-api-ajeu.onrender.com',
         ]);
         $stripeClient = new class implements ClientInterface
         {
@@ -80,11 +81,11 @@ class CheckoutSessionTest extends TestCase
             $this->assertSame(4900, $lineItems[1]['price_data']['unit_amount']);
             $this->assertSame(14900, $lineItems[2]['price_data']['unit_amount']);
             $this->assertSame(
-                'https://zuriland-frontend.onrender.com/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
+                'https://zuriland-api-ajeu.onrender.com/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
                 $stripeClient->requests[0]['params']['success_url'],
             );
             $this->assertSame(
-                'https://zuriland-frontend.onrender.com/pago-cancelado',
+                'https://zuriland-api-ajeu.onrender.com/pago-cancelado',
                 $stripeClient->requests[0]['params']['cancel_url'],
             );
         } finally {
@@ -159,6 +160,8 @@ class CheckoutSessionTest extends TestCase
         config([
             'services.paypal.client_id' => 'sandbox-client',
             'services.paypal.secret' => 'sandbox-secret',
+            'services.frontend.url' => 'https://zuriland-frontend.onrender.com',
+            'app.url' => 'https://zuriland-api-ajeu.onrender.com',
         ]);
         Http::fake([
             'https://api-m.sandbox.paypal.com/v1/oauth2/token' => Http::response([
@@ -185,6 +188,10 @@ class CheckoutSessionTest extends TestCase
         Http::assertSent(fn ($request) => str_ends_with($request->url(), '/v2/checkout/orders')
             && data_get($request->data(), 'purchase_units.0.amount.value') === '49.00'
             && data_get($request->data(), 'purchase_units.0.amount.currency_code') === 'MXN'
+            && data_get($request->data(), 'payment_source.paypal.experience_context.cancel_url')
+                === 'https://zuriland-api-ajeu.onrender.com/cart?paypal=cancelled'
+            && data_get($request->data(), 'payment_source.paypal.experience_context.return_url')
+                === 'https://zuriland-api-ajeu.onrender.com/cart?paypal=success'
         );
     }
 

@@ -47,12 +47,13 @@ class CheckoutController extends Controller
         ], $items);
 
         Stripe::setApiKey(config('services.stripe.secret'));
+        $returnUrl = rtrim(config('app.url'), '/');
 
         $session = Session::create([
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => rtrim(config('services.frontend.url'), '/').'/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => rtrim(config('services.frontend.url'), '/').'/pago-cancelado',
+            'success_url' => $returnUrl.'/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $returnUrl.'/pago-cancelado',
         ]);
 
         return response()->json(['url' => $session->url]);

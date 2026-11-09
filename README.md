@@ -124,7 +124,10 @@ Set the API's `APP_KEY` to the output of `php artisan key:generate --show`.
 After deployment, set `APP_URL` to the API's public URL. Set
 `FRONTEND_URL` and `CORS_ALLOWED_ORIGINS` if the frontend uses a separate
 origin. Enter payment-provider credentials directly in Render's environment
-settings; never put them in Git or the frontend.
+settings; never put them in Git or the frontend. Stripe and PayPal return to
+the public app origin in `APP_URL`, so for this single-service deployment it
+must be `https://zuriland-api-ajeu.onrender.com`. `FRONTEND_URL` does not
+override checkout return URLs.
 
 To enable password recovery, configure a verified SMTP sender in the Render
 service environment: `MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT=587`,

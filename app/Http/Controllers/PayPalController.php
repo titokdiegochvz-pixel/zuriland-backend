@@ -57,7 +57,7 @@ class PayPalController extends Controller
             ->all();
         $accessToken = $this->accessToken();
         $baseUrl = rtrim(config('services.paypal.base_url'), '/');
-        $frontendUrl = rtrim(config('services.frontend.url'), '/');
+        $returnUrl = rtrim(config('app.url'), '/');
 
         $response = Http::withToken($accessToken)
             ->withHeaders(['PayPal-Request-Id' => (string) Str::uuid()])
@@ -83,8 +83,8 @@ class PayPalController extends Controller
                             'brand_name' => 'ZURILAND',
                             'locale' => 'es-MX',
                             'user_action' => 'PAY_NOW',
-                            'return_url' => "{$frontendUrl}/cart?paypal=success",
-                            'cancel_url' => "{$frontendUrl}/cart?paypal=cancelled",
+                            'return_url' => "{$returnUrl}/cart?paypal=success",
+                            'cancel_url' => "{$returnUrl}/cart?paypal=cancelled",
                         ],
                     ],
                 ],
