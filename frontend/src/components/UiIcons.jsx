@@ -67,6 +67,21 @@ export const SparkIcon = () => (
     </svg>
 );
 
+export const CubeIcon = () => (
+    <svg viewBox="0 0 80 80" aria-hidden="true">
+        <path d="M40 8 68 24 40 40 12 24 40 8Z" fill="currentColor" fillOpacity=".08" />
+        <path d="M12 24v32l28 16V40L12 24Z" fill="currentColor" fillOpacity=".04" />
+        <path d="M68 24v32L40 72V40l28-16Z" fill="currentColor" fillOpacity=".12" />
+        <path
+            d="M40 8 68 24v32L40 72 12 56V24L40 8Zm0 0v32m28-16L40 40 12 24m28 16v32"
+            fill="none"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+        />
+    </svg>
+);
+
 export const CrownIcon = () => (
     <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m3 7 5 4 4-7 4 7 5-4-2 12H5L3 7Z" />

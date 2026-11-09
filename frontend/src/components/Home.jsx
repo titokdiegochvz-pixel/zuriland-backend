@@ -8,6 +8,7 @@ import {
     ServerIcon,
     UsersIcon,
     CartIcon,
+    CubeIcon,
 } from './UiIcons';
 import { useMinecraftStatus } from '../context/MinecraftStatusContext';
 import './Home.css';
@@ -35,6 +36,11 @@ const Home = () => {
     return (
         <div className="home-page">
             <section className="home-hero" aria-labelledby="home-title">
+                <div className="home-hero-cubes" aria-hidden="true">
+                    <span className="home-hero-cube home-hero-cube--one"><CubeIcon /></span>
+                    <span className="home-hero-cube home-hero-cube--two"><CubeIcon /></span>
+                    <span className="home-hero-cube home-hero-cube--three"><CubeIcon /></span>
+                </div>
                 <h1 id="home-title">
                     Bienvenido a <span>ZURILAND</span>
                 </h1>

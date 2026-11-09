@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import { useAuth } from '../auth/AuthContext';
+import { CubeIcon } from './UiIcons';
+import './Register.css';
 
 function Register() {
   const [nombre, setNombre] = useState('');
@@ -12,6 +14,23 @@ function Register() {
   const [registrando, setRegistrando] = useState(false);
   const navigate = useNavigate();
   const { iniciarSesion } = useAuth();
+
+  const handleCardPointerMove = (event) => {
+    if (event.pointerType !== 'mouse' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const horizontalPosition = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const verticalPosition = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty('--register-tilt-x', `${-verticalPosition * 6}deg`);
+    event.currentTarget.style.setProperty('--register-tilt-y', `${horizontalPosition * 6}deg`);
+  };
+
+  const resetCardTilt = (event) => {
+    event.currentTarget.style.setProperty('--register-tilt-x', '0deg');
+    event.currentTarget.style.setProperty('--register-tilt-y', '0deg');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,9 +50,20 @@ function Register() {
   };
 
   return (
-    <section>
+    <section className="register-page">
+      <div className="register-cubes" aria-hidden="true">
+        <span className="register-cube register-cube--one"><CubeIcon /></span>
+        <span className="register-cube register-cube--two"><CubeIcon /></span>
+        <span className="register-cube register-cube--three"><CubeIcon /></span>
+      </div>
       <h2>Registrarse</h2>
-      <form onSubmit={handleSubmit}>
+      <p className="register-intro">Crea tu cuenta y prepárate para la aventura.</p>
+      <form
+        className="register-form"
+        onSubmit={handleSubmit}
+        onPointerMove={handleCardPointerMove}
+        onPointerLeave={resetCardTilt}
+      >
         <div>
           <label htmlFor="nombre">Nombre:</label>
           <input id="nombre" name="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
