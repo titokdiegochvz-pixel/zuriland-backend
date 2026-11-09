@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
@@ -26,6 +27,8 @@ class CheckoutController extends Controller
         ]);
 
         if (! config('services.stripe.secret')) {
+            Log::warning('Stripe checkout is unavailable because its secret key is not configured.');
+
             return response()->json([
                 'message' => 'Los pagos con tarjeta no están configurados todavía. Inténtalo más tarde.',
             ], 503);
@@ -48,10 +51,30 @@ class CheckoutController extends Controller
         $session = Session::create([
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => rtrim(config('services.frontend.url'), '/').'/pago-exitoso',
+            'success_url' => rtrim(config('services.frontend.url'), '/').'/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => rtrim(config('services.frontend.url'), '/').'/pago-cancelado',
         ]);
 
         return response()->json(['url' => $session->url]);
+    }
+
+    public function status(string $sessionId)
+    {
+        if (! config('services.stripe.secret')) {
+            Log::warning('Stripe payment verification is unavailable because its secret key is not configured.');
+
+            return response()->json([
+                'message' => 'No se pudo verificar el pago en este momento.',
+            ], 503);
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = Session::retrieve($sessionId);
+        $paid = $session->mode === 'payment'
+            && $session->status === 'complete'
+            && $session->payment_status === 'paid';
+
+        return response()->json(['paid' => $paid]);
     }
 }

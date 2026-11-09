@@ -192,3 +192,20 @@ input {
   color: #d3a9ff;
   text-align: center;
 }
+.skip-link {
+  position: absolute;
+  z-index: 20;
+  top: 8px;
+  left: 8px;
+  padding: 10px 14px;
+  transform: translateY(-160%);
+  border: 1px solid #d6b2ff;
+  border-radius: 8px;
+  color: #fff;
+  background: #211532;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}

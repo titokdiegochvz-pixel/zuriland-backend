@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import { useAuth } from '../auth/AuthContext';
 import { CubeIcon } from './UiIcons';
+import { reportClientIssue } from '../services/issueReporting';
 import './Register.css';
 
 function Register() {
@@ -45,6 +46,11 @@ function Register() {
       navigate('/');
     } catch (error) {
       const erroresApi = error.response?.data?.errors;
+      const status = error.response?.status;
+      if (!status || status >= 500) {
+        reportClientIssue('account', status);
+      }
+
       if (erroresApi) {
         setErrores(Object.fromEntries(
           Object.entries(erroresApi).map(([field, messages]) => [field, messages[0]]),
@@ -67,10 +73,11 @@ function Register() {
         <span className="register-cube register-cube--two"><CubeIcon /></span>
         <span className="register-cube register-cube--three"><CubeIcon /></span>
       </div>
-      <h2>Registrarse</h2>
+      <h1>Registrarse</h1>
       <p className="register-intro">Crea tu cuenta y prepárate para la aventura.</p>
       <form
         className="register-form"
+        aria-busy={registrando}
         onSubmit={handleSubmit}
         onPointerMove={handleCardPointerMove}
         onPointerLeave={resetCardTilt}

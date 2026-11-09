@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
 import { API_URL } from '../config/api';
+import { reportClientIssue } from '../services/issueReporting';
 import './PasswordRecovery.css';
 
 const ResetPassword = () => {
@@ -33,6 +34,11 @@ const ResetPassword = () => {
             setMessage(response.data.message);
         } catch (requestError) {
             const erroresApi = requestError.response?.data?.errors;
+            const status = requestError.response?.status;
+            if (!status || status >= 500) {
+                reportClientIssue('account', status);
+            }
+
             if (erroresApi) {
                 setErrores(Object.fromEntries(
                     Object.entries(erroresApi).map(([field, messages]) => [field, messages[0]]),
@@ -53,7 +59,7 @@ const ResetPassword = () => {
 
     return (
         <section className="content-section password-recovery">
-            <h2>Nueva contraseña</h2>
+            <h1>Nueva contraseña</h1>
             {message ? (
                 <>
                     <p className="password-recovery-success" role="status">{message}</p>
@@ -62,7 +68,7 @@ const ResetPassword = () => {
             ) : linkValido ? (
                 <>
                     <p>Crea una contraseña nueva para tu cuenta.</p>
-                    <form className="password-recovery-form" onSubmit={handleSubmit}>
+                    <form className="password-recovery-form" onSubmit={handleSubmit} aria-busy={guardando}>
                         <label htmlFor="new-password">Nueva contraseña</label>
                         <input
                             id="new-password"

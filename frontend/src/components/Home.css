@@ -331,7 +331,7 @@
 .home-live-status-count > span,
 .home-live-address > span {
     color: #d4cae5;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 750;
     letter-spacing: 0.07em;
 }
@@ -379,7 +379,7 @@
     align-items: center;
     justify-content: center;
     gap: 7px;
-    min-height: 38px;
+    min-height: 44px;
     flex: 0 0 auto;
     padding: 0 11px;
     border: 1px solid #7251a1;
@@ -415,6 +415,7 @@
     justify-content: center;
     align-items: center;
     gap: 11px;
+    min-height: 44px;
     min-width: 230px;
     margin-top: 20px;
     padding: 13px 22px;
@@ -526,7 +527,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 42px;
+    min-height: 44px;
     flex: 0 0 auto;
     padding: 0 13px;
     border: 1px solid #6542a1;
@@ -758,6 +759,68 @@
     color: #c1c3d4;
     font-size: 12px;
     line-height: 1.5;
+}
+
+.home-faq {
+    width: min(760px, calc(100% - 40px));
+    margin: 0 auto 34px;
+    color: #f5f2ff;
+    text-align: left;
+}
+
+.home-faq h2 {
+    margin: 0 0 14px;
+    font-size: clamp(22px, 3vw, 28px);
+    text-align: center;
+}
+
+.home-faq-list {
+    border-top: 1px solid #51406e;
+}
+
+.home-faq details {
+    border-bottom: 1px solid #51406e;
+}
+
+.home-faq summary {
+    min-height: 48px;
+    padding: 14px 36px 14px 2px;
+    box-sizing: border-box;
+    color: #f0e5ff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.home-faq details[open] summary {
+    color: #d9b8ff;
+}
+
+.home-faq details p {
+    max-width: 68ch;
+    margin: 0;
+    padding: 0 4px 16px;
+    color: #d0c8df;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.home-faq code {
+    color: #f1e8ff;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    overflow-wrap: anywhere;
+}
+
+.home-faq a {
+    color: #d3a9ff;
+    text-underline-offset: 4px;
+}
+
+.home-faq summary:focus-visible,
+.home-faq a:focus-visible {
+    outline: 2px solid #d6b2ff;
+    outline-offset: 3px;
 }
 
 .home-footer {
@@ -1006,6 +1069,10 @@
         margin-top: 22px;
     }
 
+    .home-faq {
+        width: min(520px, calc(100% - 40px));
+    }
+
     .home-feature-link {
         min-height: 74px;
     }
@@ -1053,7 +1120,8 @@
 
     .server-connect-panel,
     .home-feature-links,
-    .server-context {
+    .server-context,
+    .home-faq {
         width: calc(100% - 28px);
     }
 

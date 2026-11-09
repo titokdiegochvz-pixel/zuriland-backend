@@ -90,6 +90,7 @@
     gap: 8px;
     flex: 1;
     min-width: 0;
+    min-height: 44px;
     padding: 10px 8px;
     border: 1px solid transparent;
     border-radius: 9px;
@@ -249,12 +250,27 @@
 }
 
 .store-page .rank-card .product-description {
-    min-height: 37px;
-    margin: 3px 0 12px;
+    margin: 3px 0 4px;
     color: #c9c8d8;
     font-size: 13px;
     line-height: 1.5;
     overflow-wrap: anywhere;
+}
+
+.product-benefits {
+    width: 100%;
+    min-height: 55px;
+    margin: 0 0 12px;
+    padding-left: 20px;
+    box-sizing: border-box;
+    color: #e0d9eb;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.product-benefits li + li {
+    margin-top: 2px;
 }
 
 .store-price {
@@ -278,7 +294,7 @@
     justify-content: center;
     align-items: center;
     gap: 9px;
-    min-height: 40px;
+    min-height: 44px;
 }
 
 .store-add-button svg {
@@ -359,6 +375,12 @@
     .store-page .rank-card {
         min-height: 265px;
         padding-inline: 12px;
+    }
+
+    .product-benefits {
+        min-height: 72px;
+        padding-left: 16px;
+        font-size: 12px;
     }
 
     .store-price {

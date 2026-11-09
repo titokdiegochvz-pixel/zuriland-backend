@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import { useCart } from '../store/CartContext';
 import { findStoreProduct } from '../store/catalog';
+import { reportClientIssue } from '../services/issueReporting';
 import { CartIcon, CardIcon, TrashIcon } from './UiIcons';
 import './Cart.css';
 
@@ -55,6 +56,7 @@ const Cart = () => {
             })
             .catch((error) => {
                 console.error('No se pudo confirmar el pago de PayPal:', error);
+                reportClientIssue('payment', Number(error.message.match(/HTTP (\d+)/)?.[1]));
                 setPaymentError(error.message || 'No se pudo confirmar el pago. Contacta soporte antes de volver a pagar.');
                 captureStarted.current = '';
             })
@@ -94,6 +96,8 @@ const Cart = () => {
             window.location.assign(redirectUrl);
         } catch (error) {
             console.error(`No se pudo iniciar el pago con ${provider}:`, error);
+            const status = Number(error.message.match(/HTTP (\d+)/)?.[1]);
+            reportClientIssue('payment', Number.isInteger(status) ? status : undefined);
             setPaymentError(error.message || 'No se pudo conectar con el servicio de pago.');
             setProcessing('');
         }

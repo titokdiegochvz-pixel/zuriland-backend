@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use App\Notifications\UsuarioResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -33,6 +34,25 @@ class PasswordResetTest extends TestCase
                 'message',
                 'Si el correo pertenece a una cuenta, recibirás un enlace para restablecer la contraseña.',
             );
+    }
+
+    public function test_production_does_not_claim_to_send_recovery_email_with_the_log_mailer(): void
+    {
+        $this->app->detectEnvironment(fn () => 'production');
+        config(['mail.default' => 'log']);
+        Notification::fake();
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Password recovery is unavailable because the production mailer is set to log.');
+
+        $this->postJson('/api/password/email', ['email' => 'ana@example.com'])
+            ->assertServiceUnavailable()
+            ->assertJsonPath(
+                'message',
+                'La recuperación de contraseña no está disponible en este momento.',
+            );
+
+        Notification::assertNothingSent();
     }
 
     public function test_it_resets_the_password_with_a_valid_token(): void

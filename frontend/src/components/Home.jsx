@@ -327,6 +327,46 @@ const Home = () => {
                 </Link>
             </nav>
 
+            <section className="home-faq" aria-labelledby="home-faq-title">
+                <h2 id="home-faq-title">Preguntas frecuentes</h2>
+                <div className="home-faq-list">
+                    <details>
+                        <summary>¿Qué versión de Minecraft necesito?</summary>
+                        <p>Conéctate desde Minecraft Java Edition 26.2.</p>
+                    </details>
+                    <details>
+                        <summary>¿Puedo entrar desde Bedrock?</summary>
+                        <p>
+                            La conexión confirmada es para Java Edition 26.2. La compatibilidad con
+                            Bedrock no está confirmada.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Cuál es la dirección del servidor?</summary>
+                        <p>Agrega <code>{SERVER_IP}</code> en la lista de servidores multijugador.</p>
+                    </details>
+                    <details>
+                        <summary>¿Cuándo hay días de paz y guerra?</summary>
+                        <p>
+                            De lunes a sábado son días de paz. El combate entre jugadores se habilita
+                            los domingos durante un periodo limitado; el horario exacto está pendiente
+                            de confirmación.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Qué incluyen los rangos y packs?</summary>
+                        <p>
+                            La tienda muestra el kit de cada rango y los comandos y límites publicados
+                            para cada pack. <Link to="/store">Ver productos y precios</Link>.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Dónde consulto las reglas?</summary>
+                        <p><Link to="/rules">Leer las reglas del servidor</Link>.</p>
+                    </details>
+                </div>
+            </section>
+
             <footer className="home-footer">
                 <div className="home-footer-inner">
                     <Link to="/" className="home-footer-brand" aria-label="ZuriLand, inicio">
@@ -340,6 +380,7 @@ const Home = () => {
                         <Link to="/">Inicio</Link>
                         <Link to="/store">Tienda</Link>
                         <Link to="/community">Comunidad</Link>
+                        <a href="#home-faq-title">Preguntas frecuentes</a>
                         <Link to="/rules">Reglas</Link>
                     </nav>
                     <a

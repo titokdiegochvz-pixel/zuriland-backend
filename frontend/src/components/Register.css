@@ -21,7 +21,7 @@
     transform: translateX(-50%);
 }
 
-.register-page h2 {
+.register-page h1 {
     position: relative;
     z-index: 1;
     margin-bottom: 22px;

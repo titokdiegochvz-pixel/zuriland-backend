@@ -25,6 +25,8 @@ Visitors use the public website to get the server address, explore the community
 ## Capabilities and Constraints
 
 - Server address: `pgsql-stained.tun.ply.gg`.
+- Confirmed connection: Minecraft Java Edition 26.2. Bedrock compatibility is unconfirmed.
+- Peace days are Monday through Saturday; Sunday PvP is limited to an event. The exact event time is not confirmed.
 - Existing routes include home, store, cart, community, ranking, rules, login, and registration.
 - The store has Rangos, Cosméticos, and Comandos categories. Current products are Elite (49 MXN), Dios (79 MXN), Leyenda (149 MXN), Pack Utilidad (49 MXN), and Pack Maestro (149 MXN).
 - Preserve the existing cart, catalog prices, and Stripe/PayPal checkout integration.

@@ -86,7 +86,12 @@ const Store = () => {
                                 {React.createElement(getProductIcon(product))}
                             </span>
                             <h2>{product.title}</h2>
-                            <p className="product-description">{product.description}</p>
+                            <p className="product-description">Incluye:</p>
+                            <ul className="product-benefits">
+                                {product.benefits.map((benefit) => (
+                                    <li key={benefit}>{benefit}</li>
+                                ))}
+                            </ul>
                             <strong className="store-price">
                                 ${product.price} <span>MXN</span>
                             </strong>

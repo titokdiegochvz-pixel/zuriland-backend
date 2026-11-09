@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { API_URL } from '../config/api';
+import { reportClientIssue } from '../services/issueReporting';
 
 const MinecraftStatusContext = createContext({
     status: 'loading',
@@ -18,6 +19,7 @@ export const MinecraftStatusProvider = ({ children }) => {
 
     useEffect(() => {
         let isMounted = true;
+        let outageReported = false;
         const controller = new AbortController();
 
         const loadServerStatus = async () => {
@@ -40,6 +42,7 @@ export const MinecraftStatusProvider = ({ children }) => {
                 }
 
                 if (isMounted) {
+                    outageReported = false;
                     setServerStatus({
                         status: data.online ? 'online' : 'offline',
                         players: data.online ? data.players.online : 0,
@@ -51,6 +54,15 @@ export const MinecraftStatusProvider = ({ children }) => {
                 }
             } catch (error) {
                 if (isMounted && error.name !== 'AbortError') {
+                    if (!outageReported) {
+                        const statusCode = Number(error.message.match(/HTTP (\d+)/)?.[1]);
+                        reportClientIssue(
+                            'minecraft-status',
+                            Number.isInteger(statusCode) ? statusCode : undefined,
+                        );
+                        outageReported = true;
+                    }
+
                     setServerStatus({
                         status: 'unavailable',
                         players: 0,

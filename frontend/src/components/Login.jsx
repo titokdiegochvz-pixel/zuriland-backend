@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import { useAuth } from '../auth/AuthContext';
+import { reportClientIssue } from '../services/issueReporting';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -42,6 +43,11 @@ const Login = () => {
             iniciarSesion(response.data.usuario);
             navigate('/');
         } catch (error) {
+            const status = error.response?.status;
+            if (!status || status === 429 || status >= 500) {
+                reportClientIssue('account', status);
+            }
+
             if (error.response?.status === 429) {
                 const retryHeader = Number(error.response.headers?.['retry-after']);
                 const waitSeconds = Number.isFinite(retryHeader) && retryHeader > 0
@@ -62,11 +68,11 @@ const Login = () => {
 
     return (
         <section className="content-section">
-            <h2>Iniciar sesión</h2>
+            <h1>Iniciar sesión</h1>
             <p>Inicia sesión para acceder a tu cuenta.</p>
             <p>Inicia con el nombre de usuario o correo que registraste.</p>
 
-            <form onSubmit={handleLogin} className="login-form">
+            <form onSubmit={handleLogin} className="login-form" aria-busy={iniciando}>
                 <div>
                     <label htmlFor="login-identificador">Usuario o correo electrónico</label>
                     <input

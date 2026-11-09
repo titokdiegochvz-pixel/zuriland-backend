@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { API_URL } from '../config/api';
+import { reportClientIssue } from '../services/issueReporting';
 import './PasswordRecovery.css';
 
 const ForgotPassword = () => {
@@ -20,8 +21,13 @@ const ForgotPassword = () => {
             const response = await axios.post(`${API_URL}/api/password/email`, { email });
             setMessage(response.data.message);
         } catch (requestError) {
+            const status = requestError.response?.status;
+            if (!status || status === 429 || status >= 500) {
+                reportClientIssue('account', status);
+            }
+
             setError(
-                requestError.response?.status === 429
+                status === 429
                     ? 'Hiciste varias solicitudes. Espera un minuto antes de volver a intentarlo.'
                     : requestError.response?.data?.message
                         || 'No se pudo enviar la solicitud. Inténtalo de nuevo más tarde.',
@@ -33,10 +39,10 @@ const ForgotPassword = () => {
 
     return (
         <section className="content-section password-recovery">
-            <h2>Recuperar contraseña</h2>
+            <h1>Recuperar contraseña</h1>
             <p>Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva contraseña.</p>
 
-            <form className="password-recovery-form" onSubmit={handleSubmit}>
+            <form className="password-recovery-form" onSubmit={handleSubmit} aria-busy={enviando}>
                 <label htmlFor="recovery-email">Correo electrónico</label>
                 <input
                     id="recovery-email"

@@ -111,7 +111,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    min-height: 36px;
+    min-height: 44px;
     margin-top: 5px;
     padding: 0;
     border: 0;
@@ -154,6 +154,8 @@
 }
 
 .btn-play {
+    min-height: 44px;
+    box-sizing: border-box;
     padding: 6px 21px;
     border: 2px solid #a78bfa;
     border-radius: 30px;

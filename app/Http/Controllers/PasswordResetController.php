@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
 class PasswordResetController extends Controller
@@ -13,6 +14,8 @@ class PasswordResetController extends Controller
     public function sendLink(Request $request): JsonResponse
     {
         if (app()->environment('production') && config('mail.default') === 'log') {
+            Log::warning('Password recovery is unavailable because the production mailer is set to log.');
+
             return response()->json([
                 'message' => 'La recuperación de contraseña no está disponible en este momento.',
             ], 503);

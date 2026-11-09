@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -28,6 +29,8 @@ class PayPalController extends Controller
         ]);
 
         if (! config('services.paypal.client_id') || ! config('services.paypal.secret')) {
+            Log::warning('PayPal checkout is unavailable because its credentials are not configured.');
+
             return response()->json([
                 'message' => 'PayPal no está configurado todavía. Inténtalo más tarde.',
             ], 503);
@@ -114,6 +117,8 @@ class PayPalController extends Controller
     public function captureOrder(string $orderId)
     {
         if (! config('services.paypal.client_id') || ! config('services.paypal.secret')) {
+            Log::warning('PayPal payment capture is unavailable because its credentials are not configured.');
+
             return response()->json([
                 'message' => 'PayPal no está configurado todavía. Inténtalo más tarde.',
             ], 503);
@@ -145,6 +150,12 @@ class PayPalController extends Controller
             || $capturedCurrency !== 'MXN'
             || (float) $capturedAmount !== (float) $order->amount
         ) {
+            Log::warning('PayPal capture did not match the expected order.', [
+                'order_id' => $orderId,
+                'currency_matches' => $capturedCurrency === 'MXN',
+                'amount_matches' => (float) $capturedAmount === (float) $order->amount,
+            ]);
+
             return response()->json(['message' => 'PayPal no confirmó el pago esperado.'], 409);
         }
 

@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Stripe\ApiRequestor;
+use Stripe\HttpClient\ClientInterface;
 use Tests\TestCase;
 
 class CheckoutSessionTest extends TestCase
@@ -42,7 +44,7 @@ class CheckoutSessionTest extends TestCase
             'services.stripe.secret' => 'sk_test_zuriland',
             'services.frontend.url' => 'https://zuriland-frontend.onrender.com',
         ]);
-        $stripeClient = new class implements \Stripe\HttpClient\ClientInterface
+        $stripeClient = new class implements ClientInterface
         {
             public array $requests = [];
 
@@ -57,7 +59,7 @@ class CheckoutSessionTest extends TestCase
                 ];
             }
         };
-        \Stripe\ApiRequestor::setHttpClient($stripeClient);
+        ApiRequestor::setHttpClient($stripeClient);
 
         try {
             $this->postJson('/api/create-checkout-session', [
@@ -77,9 +79,64 @@ class CheckoutSessionTest extends TestCase
             $this->assertSame(1, $lineItems[1]['quantity']);
             $this->assertSame(4900, $lineItems[1]['price_data']['unit_amount']);
             $this->assertSame(14900, $lineItems[2]['price_data']['unit_amount']);
+            $this->assertSame(
+                'https://zuriland-frontend.onrender.com/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
+                $stripeClient->requests[0]['params']['success_url'],
+            );
+            $this->assertSame(
+                'https://zuriland-frontend.onrender.com/pago-cancelado',
+                $stripeClient->requests[0]['params']['cancel_url'],
+            );
         } finally {
-            \Stripe\ApiRequestor::setHttpClient(null);
+            ApiRequestor::setHttpClient(null);
         }
+    }
+
+    public function test_stripe_payment_verification_confirms_only_paid_completed_sessions(): void
+    {
+        config(['services.stripe.secret' => 'sk_test_zuriland']);
+        $stripeClient = new class implements ClientInterface
+        {
+            public array $requests = [];
+
+            public function request($method, $absUrl, $headers, $params, $hasFile, $apiMode = 'v1', $maxNetworkRetries = null)
+            {
+                $this->requests[] = compact('method', 'absUrl');
+                $sessionId = str_ends_with($absUrl, 'cs_test_paid') ? 'cs_test_paid' : 'cs_test_unpaid';
+
+                return [
+                    json_encode([
+                        'id' => $sessionId,
+                        'object' => 'checkout.session',
+                        'mode' => 'payment',
+                        'status' => $sessionId === 'cs_test_paid' ? 'complete' : 'open',
+                        'payment_status' => $sessionId === 'cs_test_paid' ? 'paid' : 'unpaid',
+                    ]),
+                    200,
+                    ['Content-Type' => 'application/json'],
+                ];
+            }
+        };
+        ApiRequestor::setHttpClient($stripeClient);
+
+        try {
+            $this->getJson('/api/checkout-session/cs_test_paid')
+                ->assertOk()
+                ->assertJsonPath('paid', true);
+            $this->getJson('/api/checkout-session/cs_test_unpaid')
+                ->assertOk()
+                ->assertJsonPath('paid', false);
+
+            $this->assertCount(2, $stripeClient->requests);
+        } finally {
+            ApiRequestor::setHttpClient(null);
+        }
+    }
+
+    public function test_stripe_payment_verification_rejects_malformed_session_ids(): void
+    {
+        $this->getJson('/api/checkout-session/not-a-stripe-session')
+            ->assertNotFound();
     }
 
     public function test_paypal_order_reports_when_credentials_are_missing(): void

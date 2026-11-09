@@ -12,6 +12,7 @@ FROM php:8.3-apache
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 ENV PORT=10000
+ENV LOG_CHANNEL=stderr
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libpq-dev unzip \

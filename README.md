@@ -126,6 +126,26 @@ After deployment, set `APP_URL` to the API's public URL. Set
 origin. Enter payment-provider credentials directly in Render's environment
 settings; never put them in Git or the frontend.
 
+To enable password recovery, configure a verified SMTP sender in the Render
+service environment: `MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT=587`,
+`MAIL_SCHEME=tls`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, and
+`MAIL_FROM_NAME=ZuriLand`. Save the settings, wait for the service to restart,
+then send a recovery email to an account you control. Do not commit or share
+SMTP credentials. The password recovery endpoint stays unavailable while the
+production mailer is `log`; its warning is written to Render logs.
+
+Operational client reports contain only an allow-listed feature, failure type,
+and optional HTTP status (no usernames, email addresses, or raw error text).
+They are rate limited and written to the Render service logs.
+
+For end-to-end payment checks without real charges, use a separate staging
+service with Stripe test credentials (`STRIPE_SECRET` beginning with `sk_test_`)
+and PayPal sandbox credentials with
+`PAYPAL_BASE_URL=https://api-m.sandbox.paypal.com`. Test a successful checkout,
+cancel before approval, and verify that an unconfirmed order never clears the
+cart. Never put sandbox credentials on the live service. The automated tests
+mock both payment providers and do not move money.
+
 The web container starts Apache without running database migrations, and
 serves React pages directly so a database or Laravel configuration problem
 does not take the public site offline. The `/api/*` and `/up` routes continue
