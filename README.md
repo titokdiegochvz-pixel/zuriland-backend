@@ -128,7 +128,7 @@ settings; never put them in Git or the frontend.
 
 To enable password recovery, configure a verified SMTP sender in the Render
 service environment: `MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT=587`,
-`MAIL_SCHEME=tls`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, and
+`MAIL_SCHEME=smtp`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, and
 `MAIL_FROM_NAME=ZuriLand`. Save the settings, wait for the service to restart,
 then send a recovery email to an account you control. Do not commit or share
 SMTP credentials. The password recovery endpoint stays unavailable while the
