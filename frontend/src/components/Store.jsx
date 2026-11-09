@@ -67,6 +67,14 @@ const Store = () => {
                 {addedMessage || (count > 0 ? `${count} productos en tu carrito.` : '')}
             </p>
 
+            {category === 'comandos' && (
+                <p className="store-category-prices">
+                    Pack Utilidad: <strong>$49 MXN</strong>
+                    <span aria-hidden="true"> · </span>
+                    Pack Maestro: <strong>$149 MXN</strong>
+                </p>
+            )}
+
             {products.length ? (
                 <div className="shop-grid">
                     {products.map((product) => (

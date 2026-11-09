@@ -144,6 +144,18 @@
     font-size: 12px;
 }
 
+.store-category-prices {
+    margin: -5px 0 16px;
+    color: #d3c8e8;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.store-category-prices strong {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
 .store-page .shop-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
