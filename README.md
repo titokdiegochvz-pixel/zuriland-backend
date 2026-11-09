@@ -137,6 +137,8 @@ production mailer is `log`; its warning is written to Render logs.
 Operational client reports contain only an allow-listed feature, failure type,
 and optional HTTP status (no usernames, email addresses, or raw error text).
 They are rate limited and written to the Render service logs.
+To email alerts after SMTP is active, set `OPS_ALERT_EMAIL` in Render. Alerts
+are deduplicated to at most one per feature and failure type every 15 minutes.
 
 For end-to-end payment checks without real charges, use a separate staging
 service with Stripe test credentials (`STRIPE_SECRET` beginning with `sk_test_`)

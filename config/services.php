@@ -58,4 +58,8 @@ return [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
     ],
 
+    'operations' => [
+        'alert_email' => env('OPS_ALERT_EMAIL'),
+    ],
+
 ];
