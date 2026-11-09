@@ -12,8 +12,8 @@ class PayPalController extends Controller
 {
     private const PRODUCTS = [
         'Elite' => 49,
-        'Dios' => 99,
-        'Leyenda' => 199,
+        'Dios' => 79,
+        'Leyenda' => 149,
         'Pack Utilidad' => 49,
         'Pack Maestro' => 149,
     ];

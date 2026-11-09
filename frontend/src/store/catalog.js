@@ -1,7 +1,7 @@
 export const STORE_PRODUCTS = [
     { title: 'Elite', price: 49, description: 'Kit hierro', category: 'rangos' },
-    { title: 'Dios', price: 99, description: 'Kit diamante', category: 'rangos' },
-    { title: 'Leyenda', price: 199, description: 'Kit Netherite', category: 'rangos' },
+    { title: 'Dios', price: 79, description: 'Kit diamante', category: 'rangos' },
+    { title: 'Leyenda', price: 149, description: 'Kit Netherite', category: 'rangos' },
     {
         title: 'Pack Utilidad',
         price: 49,

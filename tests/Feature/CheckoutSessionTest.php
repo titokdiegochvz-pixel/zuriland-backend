@@ -64,6 +64,7 @@ class CheckoutSessionTest extends TestCase
                 'items' => [
                     ['title' => 'Dios', 'quantity' => 2],
                     ['title' => 'Elite', 'quantity' => 1],
+                    ['title' => 'Leyenda', 'quantity' => 1],
                 ],
             ])
                 ->assertOk()
@@ -72,9 +73,10 @@ class CheckoutSessionTest extends TestCase
             $this->assertCount(1, $stripeClient->requests);
             $lineItems = $stripeClient->requests[0]['params']['line_items'];
             $this->assertSame(2, $lineItems[0]['quantity']);
-            $this->assertSame(9900, $lineItems[0]['price_data']['unit_amount']);
+            $this->assertSame(7900, $lineItems[0]['price_data']['unit_amount']);
             $this->assertSame(1, $lineItems[1]['quantity']);
             $this->assertSame(4900, $lineItems[1]['price_data']['unit_amount']);
+            $this->assertSame(14900, $lineItems[2]['price_data']['unit_amount']);
         } finally {
             \Stripe\ApiRequestor::setHttpClient(null);
         }
@@ -149,6 +151,7 @@ class CheckoutSessionTest extends TestCase
             'items' => [
                 ['title' => 'Dios', 'quantity' => 2],
                 ['title' => 'Elite', 'quantity' => 1],
+                ['title' => 'Leyenda', 'quantity' => 1],
             ],
         ])
             ->assertOk()
@@ -156,16 +159,18 @@ class CheckoutSessionTest extends TestCase
 
         $this->assertDatabaseHas('paypal_orders', [
             'paypal_order_id' => 'PAYPAL-CART-123',
-            'title' => 'Dios x 2, Elite',
-            'amount' => 247,
+            'title' => 'Dios x 2, Elite, Leyenda',
+            'amount' => 356,
             'status' => 'pending',
         ]);
 
         Http::assertSent(fn ($request) => str_ends_with($request->url(), '/v2/checkout/orders')
-            && data_get($request->data(), 'purchase_units.0.amount.value') === '247.00'
-            && data_get($request->data(), 'purchase_units.0.amount.breakdown.item_total.value') === '247.00'
+            && data_get($request->data(), 'purchase_units.0.amount.value') === '356.00'
+            && data_get($request->data(), 'purchase_units.0.amount.breakdown.item_total.value') === '356.00'
             && data_get($request->data(), 'purchase_units.0.items.0.quantity') === '2'
+            && data_get($request->data(), 'purchase_units.0.items.0.unit_amount.value') === '79.00'
             && data_get($request->data(), 'purchase_units.0.items.1.unit_amount.value') === '49.00'
+            && data_get($request->data(), 'purchase_units.0.items.2.unit_amount.value') === '149.00'
         );
     }
 

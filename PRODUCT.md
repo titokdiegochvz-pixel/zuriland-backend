@@ -26,7 +26,7 @@ Visitors use the public website to get the server address, explore the community
 
 - Server address: `pgsql-stained.tun.ply.gg`.
 - Existing routes include home, store, cart, community, ranking, rules, login, and registration.
-- The store has Rangos, Cosméticos, and Comandos categories. Current products are Elite (49 MXN), Dios (99 MXN), Leyenda (199 MXN), Pack Utilidad (49 MXN), and Pack Maestro (149 MXN).
+- The store has Rangos, Cosméticos, and Comandos categories. Current products are Elite (49 MXN), Dios (79 MXN), Leyenda (149 MXN), Pack Utilidad (49 MXN), and Pack Maestro (149 MXN).
 - Preserve the existing cart, catalog prices, and Stripe/PayPal checkout integration.
 - Do not imply that a payment or server status has been verified unless its live state confirms it.
 
