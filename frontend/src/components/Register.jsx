@@ -12,6 +12,8 @@ function Register() {
   const [password, setPassword] = useState('');
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [registrando, setRegistrando] = useState(false);
+  const [errores, setErrores] = useState({});
+  const [errorGeneral, setErrorGeneral] = useState('');
   const navigate = useNavigate();
   const { iniciarSesion } = useAuth();
 
@@ -34,16 +36,25 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrores({});
+    setErrorGeneral('');
     setRegistrando(true);
     try {
       const response = await axios.post(`${API_URL}/api/usuarios`, { nombre, email, password });
       iniciarSesion(response.data);
       navigate('/');
     } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      const errores = error.response?.data?.errors;
-      const primerError = errores ? Object.values(errores).flat()[0] : null;
-      alert(primerError || error.response?.data?.message || "Error al registrar usuario.");
+      const erroresApi = error.response?.data?.errors;
+      if (erroresApi) {
+        setErrores(Object.fromEntries(
+          Object.entries(erroresApi).map(([field, messages]) => [field, messages[0]]),
+        ));
+        setErrorGeneral('Revisa los datos señalados e inténtalo de nuevo.');
+      } else {
+        setErrorGeneral(
+          error.response?.data?.message || 'No se pudo conectar con el servidor. Inténtalo de nuevo.',
+        );
+      }
     } finally {
       setRegistrando(false);
     }
@@ -66,11 +77,39 @@ function Register() {
       >
         <div>
           <label htmlFor="nombre">Nombre:</label>
-          <input id="nombre" name="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          <input
+            id="nombre"
+            name="nombre"
+            type="text"
+            value={nombre}
+            onChange={(e) => {
+              setNombre(e.target.value);
+              setErrores((actuales) => ({ ...actuales, nombre: undefined }));
+            }}
+            aria-invalid={Boolean(errores.nombre)}
+            aria-describedby={errores.nombre ? 'nombre-error' : undefined}
+            autoComplete="nickname"
+            required
+          />
+          {errores.nombre && <span id="nombre-error" className="register-field-error">{errores.nombre}</span>}
         </div>
         <div>
           <label htmlFor="email">Email:</label>
-          <input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrores((actuales) => ({ ...actuales, email: undefined }));
+            }}
+            aria-invalid={Boolean(errores.email)}
+            aria-describedby={errores.email ? 'email-error' : undefined}
+            autoComplete="email"
+            required
+          />
+          {errores.email && <span id="email-error" className="register-field-error">{errores.email}</span>}
         </div>
         <div>
           <label htmlFor="password">Contraseña:</label>
@@ -80,8 +119,13 @@ function Register() {
               name="password"
               type={mostrarPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrores((actuales) => ({ ...actuales, password: undefined }));
+              }}
               autoComplete="new-password"
+              aria-invalid={Boolean(errores.password)}
+              aria-describedby={errores.password ? 'password-help password-error' : 'password-help'}
               minLength={8}
               required
             />
@@ -95,7 +139,12 @@ function Register() {
               {mostrarPassword ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
+          <span id="password-help" className="register-password-hint">
+            Usa al menos 8 caracteres.
+          </span>
+          {errores.password && <span id="password-error" className="register-field-error">{errores.password}</span>}
         </div>
+        {errorGeneral && <p className="register-form-error" role="alert">{errorGeneral}</p>}
         <button type="submit" disabled={registrando}>
           {registrando ? 'Registrando...' : 'Registrar'}
         </button>

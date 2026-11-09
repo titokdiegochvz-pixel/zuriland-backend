@@ -107,6 +107,34 @@
     font-weight: 700;
 }
 
+.server-banner-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 36px;
+    margin-top: 5px;
+    padding: 0;
+    border: 0;
+    color: #f0e5ff;
+    background: transparent;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.server-banner-copy svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
 .banner-center {
     display: flex;
     align-items: center;
@@ -233,35 +261,61 @@
 
 @media (max-width: 600px) {
     .server-banner {
-        height: 145px;
+        height: 132px;
     }
 
     .banner-content {
-        width: 96%;
-        grid-template-columns: 1fr 1fr 1fr;
+        width: calc(100% - 24px);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: start;
+        padding-top: 12px;
+        box-sizing: border-box;
     }
 
     .banner-icon {
-        width: 23px;
-        height: 23px;
+        display: none;
     }
 
     .banner-item {
-        gap: 5px;
+        gap: 6px;
+        min-width: 0;
     }
 
     .banner-small {
-        font-size: 8px;
+        font-size: 9px;
     }
 
     .banner-item strong {
-        font-size: 9px;
+        font-size: 10px;
         overflow-wrap: anywhere;
     }
 
+    .banner-players {
+        justify-self: start;
+        text-align: left;
+    }
+
+    .banner-discord {
+        justify-self: end;
+        text-align: right;
+    }
+
+    .server-banner-copy {
+        min-height: 44px;
+        font-size: 11px;
+    }
+
     .brand-logo {
-        width: 65px;
-        height: 58px;
+        width: 48px;
+        height: 42px;
+    }
+
+    .banner-center {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 3px;
     }
 
     .guia-modal {
@@ -273,18 +327,19 @@
     }
 
     .btn-play {
-        padding: 7px 12px;
+        min-height: 44px;
+        padding: 7px 14px;
         font-size: 11px;
     }
 
     .discord-icon {
-        width: 25px;
-        height: 29px;
+        width: 36px;
+        height: 36px;
     }
 
     .discord-icon svg {
-        width: 18px;
-        height: 18px;
+        width: 22px;
+        height: 22px;
     }
 
 }

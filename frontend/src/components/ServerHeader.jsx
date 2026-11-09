@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { useMinecraftStatus } from '../context/MinecraftStatusContext';
-import { DiscordIcon, GamepadIcon } from './UiIcons';
+import { CopyIcon, DiscordIcon, GamepadIcon } from './UiIcons';
 import './ServerHeader.css';
+
+const SITE_ASSET_BASE = import.meta.env.DEV ? '' : '/site';
 
 const ServerHeader = () => {
     const { status, players } = useMinecraftStatus();
@@ -45,11 +47,19 @@ const ServerHeader = () => {
                                             : 'JUGADORES NO DISPONIBLES'}
                             </span>
                             <strong>{ip}</strong>
+                            <button
+                                type="button"
+                                className="server-banner-copy"
+                                onClick={copiarIP}
+                            >
+                                <CopyIcon />
+                                {ipCopiada ? 'IP copiada' : 'Copiar IP'}
+                            </button>
                         </div>
                     </div>
 
                     <div className="banner-center">
-                        <img className="brand-logo" src="/site/logo512.png" alt="Logo de ZuriLand" />
+                        <img className="brand-logo" src={`${SITE_ASSET_BASE}/logo512.png`} alt="Logo de ZuriLand" />
 
                         <button
                             type="button"
@@ -99,7 +109,7 @@ const ServerHeader = () => {
                             ×
                         </button>
                         <img
-                            src="/site/server-join-guide.png"
+                            src={`${SITE_ASSET_BASE}/server-join-guide.png`}
                             alt="Instrucciones para agregar y conectar al servidor pgsql-stained.tun.ply.gg en Minecraft"
                             className="guia-imagen"
                             width={2152}

@@ -133,3 +133,62 @@ input {
 .form-options a {
   color: #00D4FF; /* Azul Eléctrico */
 }
+
+.login-form {
+  display: grid;
+  width: min(100%, 480px);
+  min-width: 0;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+.login-form label {
+  display: block;
+  line-height: 1.5;
+}
+
+.login-form input:not([type="checkbox"]) {
+  min-height: 46px;
+  margin: 8px 0 12px;
+  font-size: 16px;
+}
+
+.login-form .form-options {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  line-height: 1.5;
+}
+
+.login-form .form-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.login-form .form-options input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.login-form .form-options a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-underline-offset: 4px;
+}
+
+.login-form .btn-buy {
+  min-height: 46px;
+  margin-top: 4px;
+}
+
+.route-loading {
+  min-height: 160px;
+  padding: 48px 20px;
+  box-sizing: border-box;
+  color: #d3a9ff;
+  text-align: center;
+}

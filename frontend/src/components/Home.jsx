@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     BookIcon,
@@ -8,16 +8,77 @@ import {
     ServerIcon,
     UsersIcon,
     CartIcon,
-    CubeIcon,
 } from './UiIcons';
 import { useMinecraftStatus } from '../context/MinecraftStatusContext';
 import './Home.css';
 
 const SERVER_IP = 'pgsql-stained.tun.ply.gg';
+const SERVER_GUIDE_IMAGE = import.meta.env.DEV
+    ? '/server-join-guide.png'
+    : '/site/server-join-guide.png';
 
 const Home = () => {
     const [copyMessage, setCopyMessage] = useState('');
+    const [heroMotionActive, setHeroMotionActive] = useState(false);
+    const heroRef = useRef(null);
     const { status, players } = useMinecraftStatus();
+
+    useEffect(() => {
+        const hero = heroRef.current;
+        if (!hero) {
+            return undefined;
+        }
+
+        const updateMotionState = (isVisible) => {
+            setHeroMotionActive(isVisible && !document.hidden);
+        };
+
+        if (!('IntersectionObserver' in window)) {
+            updateMotionState(true);
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            updateMotionState(entry.isIntersecting);
+        }, { threshold: 0.05 });
+        const handleVisibilityChange = () => {
+            const bounds = hero.getBoundingClientRect();
+            updateMotionState(
+                bounds.bottom > 0 && bounds.top < window.innerHeight,
+            );
+        };
+
+        observer.observe(hero);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            observer.disconnect();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    const handleStatusPointerMove = (event) => {
+        if (
+            event.pointerType !== 'mouse'
+            || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+            return;
+        }
+
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const horizontalPosition = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const verticalPosition = (event.clientY - bounds.top) / bounds.height - 0.5;
+        event.currentTarget.style.setProperty('--home-card-tilt-x', `${-verticalPosition * 5}deg`);
+        event.currentTarget.style.setProperty('--home-card-tilt-y', `${horizontalPosition * 5}deg`);
+        event.currentTarget.style.setProperty('--home-card-light-x', `${horizontalPosition * 100 + 50}%`);
+        event.currentTarget.style.setProperty('--home-card-light-y', `${verticalPosition * 100 + 50}%`);
+    };
+
+    const resetStatusTilt = (event) => {
+        event.currentTarget.style.setProperty('--home-card-tilt-x', '1deg');
+        event.currentTarget.style.setProperty('--home-card-tilt-y', '0deg');
+        event.currentTarget.style.setProperty('--home-card-light-x', '50%');
+        event.currentTarget.style.setProperty('--home-card-light-y', '50%');
+    };
 
     const copyServerAddress = async () => {
         try {
@@ -35,11 +96,36 @@ const Home = () => {
 
     return (
         <div className="home-page">
-            <section className="home-hero" aria-labelledby="home-title">
-                <div className="home-hero-cubes" aria-hidden="true">
-                    <span className="home-hero-cube home-hero-cube--one"><CubeIcon /></span>
-                    <span className="home-hero-cube home-hero-cube--two"><CubeIcon /></span>
-                    <span className="home-hero-cube home-hero-cube--three"><CubeIcon /></span>
+            <section ref={heroRef} className="home-hero" aria-labelledby="home-title">
+                <div
+                    className={`home-hero-cubes${heroMotionActive ? ' home-hero-cubes--active' : ''}`}
+                    aria-hidden="true"
+                >
+                    <span className="home-hero-orbit" />
+                    <span className="home-hero-cube home-hero-cube--one">
+                        <span className="home-hero-cube-face home-hero-cube-face--front" />
+                        <span className="home-hero-cube-face home-hero-cube-face--back" />
+                        <span className="home-hero-cube-face home-hero-cube-face--right" />
+                        <span className="home-hero-cube-face home-hero-cube-face--left" />
+                        <span className="home-hero-cube-face home-hero-cube-face--top" />
+                        <span className="home-hero-cube-face home-hero-cube-face--bottom" />
+                    </span>
+                    <span className="home-hero-cube home-hero-cube--two">
+                        <span className="home-hero-cube-face home-hero-cube-face--front" />
+                        <span className="home-hero-cube-face home-hero-cube-face--back" />
+                        <span className="home-hero-cube-face home-hero-cube-face--right" />
+                        <span className="home-hero-cube-face home-hero-cube-face--left" />
+                        <span className="home-hero-cube-face home-hero-cube-face--top" />
+                        <span className="home-hero-cube-face home-hero-cube-face--bottom" />
+                    </span>
+                    <span className="home-hero-cube home-hero-cube--three">
+                        <span className="home-hero-cube-face home-hero-cube-face--front" />
+                        <span className="home-hero-cube-face home-hero-cube-face--back" />
+                        <span className="home-hero-cube-face home-hero-cube-face--right" />
+                        <span className="home-hero-cube-face home-hero-cube-face--left" />
+                        <span className="home-hero-cube-face home-hero-cube-face--top" />
+                        <span className="home-hero-cube-face home-hero-cube-face--bottom" />
+                    </span>
                 </div>
                 <h1 id="home-title">
                     Bienvenido a <span>ZURILAND</span>
@@ -54,6 +140,8 @@ const Home = () => {
                     className={`home-live-status home-live-status--${status}`}
                     role="status"
                     aria-live="polite"
+                    onPointerMove={handleStatusPointerMove}
+                    onPointerLeave={resetStatusTilt}
                 >
                     <span className="home-live-status-dot" aria-hidden="true" />
                     <div className="home-live-status-count">
@@ -135,6 +223,17 @@ const Home = () => {
                         <span>Pega la IP, guarda el servidor y selecciónalo para entrar.</span>
                     </li>
                 </ol>
+
+                <figure className="server-connect-guide">
+                    <img
+                        src={SERVER_GUIDE_IMAGE}
+                        alt="Guía visual para agregar pgsql-stained.tun.ply.gg a Minecraft Java"
+                        width="2152"
+                        height="731"
+                        loading="lazy"
+                    />
+                    <figcaption>Guía rápida para entrar desde Minecraft Java.</figcaption>
+                </figure>
 
                 {copyMessage && (
                     <span className="server-copy-message" role="status">

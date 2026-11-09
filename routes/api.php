@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\TownyRankingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CheckoutController;
@@ -23,3 +24,5 @@ Route::post('/paypal/orders/{orderId}/capture', [PayPalController::class, 'captu
 
 Route::post('/usuarios', [UsuarioController::class, 'store']);
 Route::post('/login', [UsuarioController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/password/email', [PasswordResetController::class, 'sendLink'])->middleware('throttle:3,1');
+Route::post('/password/reset', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1');

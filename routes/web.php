@@ -11,6 +11,7 @@ $serveFrontend = function () {
 };
 
 Route::get('/', $serveFrontend);
+Route::get('/reset-password', $serveFrontend)->name('password.reset');
 Route::get('/{path}', function () use ($serveFrontend) {
     abort_if(str_starts_with(request()->path(), 'api/'), 404);
 

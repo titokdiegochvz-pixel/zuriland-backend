@@ -35,6 +35,13 @@ class UsuarioController extends Controller
             'nombre' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:usuarios',
             'password' => 'required|string|min:8',
+        ], [
+            'nombre.required' => 'Escribe tu nombre de jugador.',
+            'email.required' => 'Escribe tu correo electrónico.',
+            'email.email' => 'Escribe un correo electrónico válido.',
+            'email.unique' => 'Este correo ya tiene una cuenta.',
+            'password.required' => 'Escribe una contraseña.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);

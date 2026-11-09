@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
@@ -9,11 +9,28 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [iniciando, setIniciando] = useState(false);
+    const [retryAfter, setRetryAfter] = useState(0);
     const navigate = useNavigate();
     const { iniciarSesion } = useAuth();
 
+    useEffect(() => {
+        if (retryAfter <= 0) {
+            return undefined;
+        }
+
+        const timer = window.setTimeout(() => {
+            setRetryAfter((remaining) => Math.max(remaining - 1, 0));
+        }, 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [retryAfter]);
+
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (retryAfter > 0 || iniciando) {
+            return;
+        }
+
         setError('');
         setIniciando(true);
 
@@ -25,10 +42,19 @@ const Login = () => {
             iniciarSesion(response.data.usuario);
             navigate('/');
         } catch (error) {
-            const mensaje = error.response?.data?.errors
-                ? Object.values(error.response.data.errors).flat()[0]
-                : error.response?.data?.message || 'No se pudo conectar con el servidor.';
-            setError(mensaje);
+            if (error.response?.status === 429) {
+                const retryHeader = Number(error.response.headers?.['retry-after']);
+                const waitSeconds = Number.isFinite(retryHeader) && retryHeader > 0
+                    ? Math.ceil(retryHeader)
+                    : 60;
+                setRetryAfter(waitSeconds);
+                setError(`Demasiados intentos. Espera ${waitSeconds} segundos antes de volver a intentarlo.`);
+            } else {
+                const mensaje = error.response?.data?.errors
+                    ? Object.values(error.response.data.errors).flat()[0]
+                    : error.response?.data?.message || 'No se pudo conectar con el servidor.';
+                setError(mensaje);
+            }
         } finally {
             setIniciando(false);
         }
@@ -72,11 +98,15 @@ const Login = () => {
                         <input id="remember-login" type="checkbox" /> Recordarme
                     </label>
 
-                    <Link to="/register">¿Olvidaste tu contraseña?</Link>
+                    <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
                 </div>
 
-                <button type="submit" className="btn-buy" disabled={iniciando}>
-                    {iniciando ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                <button type="submit" className="btn-buy" disabled={iniciando || retryAfter > 0}>
+                    {iniciando
+                        ? 'Iniciando sesión...'
+                        : retryAfter > 0
+                            ? `Intenta de nuevo en ${retryAfter}s`
+                            : 'Iniciar sesión'}
                 </button>
             </form>
         </section>

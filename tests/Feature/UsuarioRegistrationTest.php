@@ -68,4 +68,21 @@ class UsuarioRegistrationTest extends TestCase
         ])->assertUnauthorized()
             ->assertJsonPath('message', 'Usuario o contraseña incorrectos.');
     }
+
+    public function test_it_returns_clear_registration_validation_errors(): void
+    {
+        $this->postJson('/api/usuarios', [
+            'nombre' => 'Ana',
+            'email' => 'ana@example.com',
+            'password' => 'ClaveSegura123',
+        ])->assertCreated();
+
+        $this->postJson('/api/usuarios', [
+            'nombre' => 'Ana',
+            'email' => 'ana@example.com',
+            'password' => 'short',
+        ])->assertUnprocessable()
+            ->assertJsonPath('errors.email.0', 'Este correo ya tiene una cuenta.')
+            ->assertJsonPath('errors.password.0', 'La contraseña debe tener al menos 8 caracteres.');
+    }
 }
